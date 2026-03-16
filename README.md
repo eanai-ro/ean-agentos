@@ -1,47 +1,47 @@
 # 🧠 EAN AgentOS
 
-### Memorie permanentă pentru agenți AI de programare
+### Persistent Memory for AI Coding Agents
 
-**Nu mai rezolva același bug de două ori.**
+**Never solve the same bug twice.**
 
 ---
 
-## Ce face EAN AgentOS?
+## What does EAN AgentOS do?
 
-Agentul tău AI uită totul între sesiuni. EAN AgentOS îi dă memorie permanentă.
+Your AI agent forgets everything between sessions. EAN AgentOS gives it permanent memory.
 
 ```
-Sesiunea 1:
-  > Eroare CORS în Flask
-  > Rezolvat: pip install flask-cors + CORS(app)
+Session 1:
+  > CORS error in Flask
+  > Fixed: pip install flask-cors + CORS(app)
 
-Sesiunea 2 (3 luni mai târziu):
-  > Aceeași eroare CORS
-  > AgentOS: "Ai rezolvat asta pe 12 martie. Soluția: flask-cors middleware"
+Session 2 (3 months later):
+  > Same CORS error
+  > AgentOS: "You solved this on March 12. Solution: flask-cors middleware"
 ```
 
-**Funcționează cu Claude Code, Gemini CLI, Codex CLI și Kimi CLI.** Toți agenții împărtășesc aceeași memorie.
+**Works with Claude Code, Gemini CLI, Codex CLI, and Kimi CLI.** All agents share the same memory.
 
 ---
 
-## Funcționalități
+## Features
 
-| Feature | Descriere |
-|---------|-----------|
-| 🔁 **Memorie Permanentă** | Decizii, fapte, obiective, task-uri — persistate între sesiuni |
-| 💡 **`mem suggest`** | Caută soluții anterioare: *"Nu mai rezolva același bug de două ori"* |
-| 🧬 **Knowledge Extraction** | Extragere automată de pattern-uri, scoruri, deduplicare |
-| 🔍 **Căutare Cognitivă** | Caută în rezoluții, decizii, fapte, mesaje |
-| 🌳 **Memory Branches** | Ramuri de memorie per git branch |
-| 📊 **Experience Graph** | Graf problem → soluție → rezultat |
-| 🔄 **Cross-Agent Learning** | Agenții învață din experiența celorlalți |
-| 💾 **Backup & Recovery** | Backup automat, restaurare, verificare integritate |
-| 🖥️ **Web Dashboard** | Vizualizare decizii, fapte, timeline, health |
-| 🔌 **MCP Server** | Integrare nativă cu Claude Code + alte CLI-uri |
+| Feature | Description |
+|---------|-------------|
+| 🔁 **Persistent Memory** | Decisions, facts, goals, tasks — persisted across sessions |
+| 💡 **`mem suggest`** | Find past solutions: *"Never solve the same bug twice"* |
+| 🧬 **Knowledge Extraction** | Auto-extract patterns, scoring, deduplication |
+| 🔍 **Cognitive Search** | Search across resolutions, decisions, facts, messages |
+| 🌳 **Memory Branches** | Branch-aware memory per git branch |
+| 📊 **Experience Graph** | Problem → solution → outcome graph |
+| 🔄 **Cross-Agent Learning** | Agents learn from each other's experience |
+| 💾 **Backup & Recovery** | Auto backup, restore, integrity verification |
+| 🖥️ **Web Dashboard** | Visualize decisions, facts, timeline, health |
+| 🔌 **MCP Server** | Native integration with Claude Code + other CLIs |
 
 ---
 
-## Instalare rapidă
+## Quick Install
 
 ```bash
 git clone https://github.com/eanai-ro/ean-agentos.git
@@ -49,21 +49,21 @@ cd ean-agentos
 ./install.sh
 ```
 
-Installer-ul detectează automat CLI-urile instalate și te lasă să alegi pe care să le integrezi.
+The installer auto-detects installed CLIs and lets you choose which to integrate.
 
-### Sau manual:
+### Or manually:
 
 ```bash
 pip install flask flask-cors
 python3 scripts/init_db.py
-python3 scripts/ean_memory.py install claude   # sau gemini, codex
+python3 scripts/ean_memory.py install claude   # or gemini, codex
 ```
 
 ---
 
-## Utilizare
+## Usage
 
-### Nu mai rezolva același bug de două ori
+### Never solve the same bug twice
 
 ```bash
 mem suggest "CORS error"
@@ -79,48 +79,48 @@ mem suggest "CORS error"
      Match: 100% | Confidence: 92% | Agent: claude-code
 ```
 
-### Comenzi principale
+### Key Commands
 
 ```bash
-mem suggest "eroare"          # Caută soluții anterioare
-mem search "keyword"          # Caută în toată memoria
-mem decisions                 # Vezi decizii active
-mem status                    # Status memorie
-mem graph stats               # Statistici experience graph
+mem suggest "error message"   # Find past solutions
+mem search "keyword"          # Search all memory
+mem decisions                 # View active decisions
+mem status                    # Memory status
+mem graph stats               # Experience graph stats
 ```
 
 ### Web Dashboard
 
 ```bash
 python3 scripts/web_server.py
-# Deschide: http://localhost:19876
+# Open: http://localhost:19876
 ```
 
-### MCP Server (pentru Claude Code)
+### MCP Server (for Claude Code)
 
-Se configurează automat la instalare. Agentul tău AI primește context din memoria permanentă la fiecare sesiune.
+Configured automatically during install. Your AI agent receives context from permanent memory at every session.
 
 ---
 
-## CLI-uri Suportate
+## Supported CLIs
 
-| CLI | Integrare | Comandă instalare |
-|-----|-----------|-------------------|
+| CLI | Integration | Install Command |
+|-----|-------------|-----------------|
 | **Claude Code** | Hooks + MCP Server | `python3 scripts/ean_memory.py install claude` |
 | **Gemini CLI** | Hooks | `python3 scripts/ean_memory.py install gemini` |
 | **Codex CLI** | Hooks | `python3 scripts/ean_memory.py install codex` |
 | **Kimi CLI** | MCP Server | Manual config |
 
-Toate CLI-urile citesc și scriu în aceeași bază de date. Ceea ce învață un agent e disponibil pentru toți.
+All CLIs read and write to the same database. What one agent learns is available to all.
 
 ---
 
-## Cum funcționează
+## How It Works
 
 ```
   Claude Code    Gemini CLI    Codex CLI    Kimi CLI
        │              │             │            │
-       │     captură automată (hooks)            │
+       │     auto-capture (hooks)                │
        └──────────────┬─────────────┬────────────┘
                       │             │
                       ▼             ▼
@@ -132,7 +132,7 @@ Toate CLI-urile citesc și scriu în aceeași bază de date. Ceea ce învață u
                │  error_resolutions       │
                │  experience_graph        │
                │  solution_index          │
-               │  ...49 tabele            │
+               │  ...49 tables            │
                └──────────────────────────┘
                       │
           ┌───────────┼───────────┐
@@ -141,77 +141,77 @@ Toate CLI-urile citesc și scriu în aceeași bază de date. Ceea ce învață u
        Dashboard   (Claude)     (terminal)
 ```
 
-1. **Captura**: Hooks-urile capturează automat decizii, erori, soluții din sesiunile AI
-2. **Structurare**: Knowledge Extractor clasifică, scorează și deduplică
-3. **Căutare**: La fiecare sesiune nouă, agentul primește context relevant
-4. **Învățare**: Solution Index + Experience Graph = memoria devine mai inteligentă
+1. **Capture**: Hooks auto-capture decisions, errors, solutions from AI sessions
+2. **Structure**: Knowledge Extractor classifies, scores, and deduplicates
+3. **Retrieve**: At each new session, the agent receives relevant context
+4. **Learn**: Solution Index + Experience Graph = memory gets smarter
 
 ---
 
-## Structura proiectului
+## Project Structure
 
 ```
 ean-agentos/
 ├── scripts/
-│   ├── mem                      # CLI principal
-│   ├── v2_common.py             # Core DB + utilități
-│   ├── init_db.py               # Inițializare DB
+│   ├── mem                      # Main CLI
+│   ├── v2_common.py             # Core DB + utilities
+│   ├── init_db.py               # DB initialization
 │   ├── solution_index.py        # 💡 mem suggest
-│   ├── knowledge_extractor.py   # Extragere automată
-│   ├── context_builder_v2.py    # Context pentru LLM
-│   ├── experience_graph.py      # Graf experiențe
-│   ├── search_memory.py         # Căutare unificată
+│   ├── knowledge_extractor.py   # Auto-extraction
+│   ├── context_builder_v2.py    # LLM context builder
+│   ├── experience_graph.py      # Experience graph
+│   ├── search_memory.py         # Unified search
 │   ├── backup_manager.py        # Backup & restore
-│   ├── web_server.py            # Dashboard web
+│   ├── web_server.py            # Web dashboard
 │   ├── ean_memory.py            # Installer
 │   └── ...
 ├── web/                         # Dashboard HTML/JS/CSS
-├── mcp_server/                  # MCP pentru Claude Code
-├── mcp-server/                  # MCP pentru Kimi CLI
-├── migrations/                  # Schema DB
-├── install.sh                   # Installer interactiv
-├── test_full.sh                 # Test suite (57 teste)
-└── Dockerfile                   # Container test
+├── mcp_server/                  # MCP for Claude Code
+├── mcp-server/                  # MCP for Kimi CLI
+├── migrations/                  # DB schema
+├── install.sh                   # Interactive installer
+├── test_full.sh                 # Test suite (57 tests)
+└── Dockerfile                   # Test container
 ```
 
 ---
 
-## Teste
+## Testing
 
 ```bash
 ./test_full.sh
 ```
 
-57 teste acoperă: structură, database, importuri, license gate, mem suggest, experience graph, context builder, search, web server, MCP, integritate DB, backup.
+57 tests covering: structure, database, imports, license gate, mem suggest, experience graph, context builder, search, web server, MCP, DB integrity, backup.
 
 ---
 
 ## EAN AgentOS Pro 🔒
 
-Versiunea Pro adaugă **orchestrare multi-agent** — coordonarea mai multor CLI-uri AI pe același proiect:
+The Pro version adds **multi-agent orchestration** — coordinating multiple AI CLIs on the same project:
 
-| Feature Pro | Descriere |
-|------------|-----------|
-| 🤖 **Multi-Agent Orchestration** | Proiecte cu task-uri, lease-based ownership |
-| 🗣️ **AI Deliberation** | Sesiuni structurate multi-round cu sinteză |
-| 🚀 **CLI Launcher** | Lansare programatică Claude/Gemini/Codex/Kimi |
+| Pro Feature | Description |
+|------------|-------------|
+| 🤖 **Multi-Agent Orchestration** | Projects with tasks, lease-based ownership |
+| 🗣️ **AI Deliberation** | Structured multi-round sessions with synthesis |
+| 🚀 **CLI Launcher** | Programmatically launch Claude/Gemini/Codex/Kimi |
 | 🔄 **Auto-Pipeline** | Task chaining, auto-review, conflict resolution |
 | 🧠 **Intelligence Layer** | Capability scoring, weighted voting, skill learning |
-| 📼 **Replay System** | Timeline complete proiecte + deliberări |
-| 📋 **Peer Review** | Verdicte formale, auto-fix |
+| 📼 **Replay System** | Complete project + deliberation timelines |
+| 📋 **Peer Review** | Formal verdicts, auto-fix |
 
-**Detalii**: [ean-agentos.dev/pro](https://ean-agentos.dev/pro)
+**Details**: [ean-agentos.dev/pro](https://ean-agentos.dev/pro)
 
 ---
 
 ## License
 
-MIT — vezi [LICENSE](LICENSE)
+MIT — see [LICENSE](LICENSE)
 
 ---
 
-## Despre
+## About
 
-Dezvoltat de **EAN** (Encean Alexandru Nicolae) 🇷🇴
+Built by **EAN** (Encean Alexandru Nicolae) 🇷🇴
 
-*Memorie permanentă pentru agenți AI. Nu mai uita. Nu mai repeta. Învață.*
+*Persistent memory for AI agents. Don't forget. Don't repeat. Learn.*
