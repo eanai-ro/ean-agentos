@@ -36,7 +36,7 @@ try:
     GLOBAL_DB = resolve_db_path()
 except ImportError:
     GLOBAL_DB = Path.home() / ".claude" / "memory" / "global.db"
-PROJECT_MEMORY_DIR = ".claude-memory"
+PROJECT_MEMORY_DIR = ".ean-agentos-memory"
 PROJECT_DB_NAME = "project.db"
 
 
@@ -72,7 +72,7 @@ def get_dbs_to_search(scope: str) -> List[tuple]:
             dbs.append((project_db, "PROJECT"))
         else:
             print("⚠️  Nu există memorie de proiect în directorul curent.")
-            print("   Folosește: python3 ~/.claude/memory/scripts/init_project_memory.py")
+            print("   Folosește: python3 scripts/init_project_memory.py")
     elif scope == "global":
         dbs.append((GLOBAL_DB, "GLOBAL"))
     else:  # both

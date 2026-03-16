@@ -47,7 +47,7 @@ except ImportError:
     if os.environ.get("MEMORY_DB_PATH"):
         GLOBAL_DB = Path(os.environ["MEMORY_DB_PATH"])
 
-# WEB_DIR: prefer env var, then project web/, then default ~/.claude/memory/web
+# WEB_DIR: prefer env var, then project web/, then default project web/
 if os.environ.get("MEMORY_WEB_DIR"):
     WEB_DIR = Path(os.environ["MEMORY_WEB_DIR"])
 elif (SCRIPTS_DIR.parent / "web" / "index.html").exists():

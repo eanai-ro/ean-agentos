@@ -199,7 +199,7 @@ def main():
     )
     ap.add_argument(
         "--db",
-        default=str(Path.home() / ".claude/memory/global.db"),
+        default=str(resolve_db_path()),
         help="Path to database"
     )
     ap.add_argument(

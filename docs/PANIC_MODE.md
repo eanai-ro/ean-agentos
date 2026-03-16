@@ -177,7 +177,7 @@ Următoarele pattern-uri sunt **excluse automat**:
     "global.db": {
       "size": 562991104,
       "sha256": "abc123...",
-      "source": "/home/sandu/.claude/memory/global.db"
+      "source": "/path/to/ean-agentos/global.db"
     },
     ...
   }

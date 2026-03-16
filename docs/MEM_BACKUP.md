@@ -55,11 +55,11 @@ Fiecare snapshot include un `manifest.json` cu:
   "timestamp": "2026-02-07T23:15:14+02:00",
   "hostname": "ai",
   "user": "sandu",
-  "repo_path": "/home/sandu/.claude/memory",
+  "repo_path": "/path/to/ean-agentos",
   "db_size": 562225152,
   "git_sha": "31fead086db7680fb1a2eb5060ad28b29155b6bd",
   "wal_mode": "wal",
-  "snapshot_dir": "/home/sandu/.claude/memory/backups/20260207_231511",
+  "snapshot_dir": "/path/to/ean-agentos/backups/20260207_231511",
   "keep_days": 14
 }
 ```
@@ -126,7 +126,7 @@ cp $SNAPSHOT/.context_monitor_state.json ./
 crontab -e
 
 # Rulează zilnic la 3 AM, păstrează 30 zile
-0 3 * * * /home/sandu/.claude/memory/scripts/mem backup --keep 30 >> /tmp/mem_backup.log 2>&1
+0 3 * * * /path/to/ean-agentos/scripts/mem backup --keep 30 >> /tmp/mem_backup.log 2>&1
 ```
 
 ### Systemd timer
@@ -138,7 +138,7 @@ Description=EAN AgentOS Backup Service
 
 [Service]
 Type=oneshot
-ExecStart=/home/sandu/.claude/memory/scripts/mem_backup.sh 30
+ExecStart=/path/to/ean-agentos/scripts/mem_backup.sh 30
 StandardOutput=journal
 StandardError=journal
 

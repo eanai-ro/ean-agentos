@@ -29,7 +29,7 @@ try:
     DB_PATH = resolve_db_path()
 except ImportError:
     DB_PATH = Path.home() / ".claude" / "memory" / "global.db"
-SESSION_FILE = Path.home() / ".claude/memory/.current_session"
+SESSION_FILE = Path(__file__).parent.parent / ".current_session"
 
 
 def get_db():

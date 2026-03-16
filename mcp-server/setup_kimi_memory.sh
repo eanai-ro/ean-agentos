@@ -22,7 +22,7 @@ chmod +x "$MEMORY_DIR/mcp-server/kimi_memory_server.py"
 echo "✅ MCP server copiat"
 
 # 3. Copiază DB din Claude (dacă există)
-CLAUDE_DB="$HOME/.claude/memory/global.db"
+CLAUDE_DB="$HOME/.ean-agentos/global.db"
 KIMI_DB="$MEMORY_DIR/global.db"
 
 if [ -f "$CLAUDE_DB" ]; then

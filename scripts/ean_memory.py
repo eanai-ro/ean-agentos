@@ -130,7 +130,7 @@ def _detect_environment():
     env["claude_available"] = _which("claude") is not None
     env["claude_dir"] = CLAUDE_DIR.exists()
     env["claude_mcp_json"] = (CLAUDE_DIR / ".mcp.json").exists()
-    env["claude_memory_db"] = MEMORY_DB_DEFAULT.exists()
+    env["ean_memory_db"] = MEMORY_DB_DEFAULT.exists()
 
     # Gemini CLI
     env["gemini_available"] = _which("gemini") is not None

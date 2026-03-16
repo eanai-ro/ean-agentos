@@ -15,7 +15,7 @@ ls -la scripts/mem
 chmod +x scripts/mem
 
 # Adaugă în PATH (în ~/.bashrc sau ~/.zshrc)
-export PATH="$HOME/.claude/memory/scripts:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Reîncarcă shell
 source ~/.bashrc  # sau source ~/.zshrc

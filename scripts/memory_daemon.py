@@ -51,14 +51,14 @@ TG_ALERT_STATE_FILE = MEMORY_DIR / ".tg_alert_state.json"
 TG_ALERT_DEBOUNCE_SECONDS = 300  # 5 minute între alerte
 
 # Project-scoped memory
-PROJECT_MEMORY_DIR = ".claude-memory"
+PROJECT_MEMORY_DIR = ".ean-agentos-memory"
 PROJECT_DB_NAME = "project.db"
 
 
 def get_project_db_path() -> Optional[Path]:
     """Găsește DB-ul specific proiectului dacă există."""
     cwd = Path.cwd()
-    # Caută .claude-memory în directorul curent sau părinți (până la 5 nivele)
+    # Caută .ean-agentos-memory în directorul curent sau părinți (până la 5 nivele)
     for _ in range(5):
         project_db = cwd / PROJECT_MEMORY_DIR / PROJECT_DB_NAME
         if project_db.exists():

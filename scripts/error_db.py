@@ -11,7 +11,7 @@ Comenzi:
 
 Utilizare automată:
     Când întâmpini o eroare, rulează:
-    python3 ~/.claude/memory/scripts/error_db.py search "textul erorii"
+    python3 scripts/error_db.py search "textul erorii"
 """
 
 import sqlite3
@@ -101,7 +101,7 @@ def add_error(error_type=None, error_message=None, solution=None, solution_code=
 
     # Obține session_id curent dacă există
     session_id = None
-    session_file = Path.home() / ".claude/memory/.current_session"
+    session_file = Path(__file__).parent.parent / ".current_session"
     if session_file.exists():
         session_id = session_file.read_text().strip()
 

@@ -34,7 +34,7 @@ CHROMA_DIR = MEMORY_DIR / "chroma"
 
 # Model de embedding
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-COLLECTION_NAME = "claude_memory"
+COLLECTION_NAME = "ean_agentos"
 
 # Lazy loading pentru dependențe grele
 _chroma_client = None

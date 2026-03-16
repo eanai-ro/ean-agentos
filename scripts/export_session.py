@@ -11,8 +11,8 @@ Comenzi:
     export_session export SESSION_ID -o /path/output.md  # Cu cale personalizată
 
 Utilizare:
-    python3 ~/.claude/memory/scripts/export_session.py list
-    python3 ~/.claude/memory/scripts/export_session.py export --last
+    python3 scripts/export_session.py list
+    python3 scripts/export_session.py export --last
 """
 
 import sys
@@ -28,7 +28,7 @@ try:
     DB_PATH = resolve_db_path()
 except ImportError:
     DB_PATH = Path.home() / ".claude" / "memory" / "global.db"
-EXPORT_DIR = Path.home() / ".claude/memory/exports"
+EXPORT_DIR = Path(__file__).parent.parent / "exports"
 
 
 def get_db():

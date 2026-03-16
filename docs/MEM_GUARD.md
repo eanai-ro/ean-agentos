@@ -119,7 +119,7 @@ if guard_result["hits"] and should_block(guard_result["severity"]):
 ### Quarantine Write
 
 Când guard blochează:
-1. **Scrie în quarantine**: `/home/sandu/.claude/memory/quarantine/q_<timestamp>_<event>.json`
+1. **Scrie în quarantine**: `/path/to/ean-agentos/quarantine/q_<timestamp>_<event>.json`
 2. **Update state**: `.guard_state.json` cu counters
 3. **Log error**: `log_error()` pentru visibility
 4. **Return early**: NU face INSERT în DB

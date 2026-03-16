@@ -6,9 +6,9 @@ Folosește acest script DUPĂ AUTO-COMPACT sau la începutul unei sesiuni noi
 pentru a reîncărca contextul complet.
 
 Utilizare:
-    python3 ~/.claude/memory/scripts/reload_memory.py
-    python3 ~/.claude/memory/scripts/reload_memory.py --full
-    python3 ~/.claude/memory/scripts/reload_memory.py --project /cale/proiect
+    python3 scripts/reload_memory.py
+    python3 scripts/reload_memory.py --full
+    python3 scripts/reload_memory.py --project /cale/proiect
 """
 
 import sqlite3

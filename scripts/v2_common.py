@@ -28,7 +28,7 @@ def resolve_db_path() -> Path:
     """Rezolvă path-ul DB universal. Ordinea:
     1. MEMORY_DB_PATH env var (override explicit)
     2. <project_root>/global.db (canonical V2)
-    3. ~/.claude/memory/global.db (legacy fallback)
+    3. ~/.ean-agentos/global.db (legacy fallback)
     """
     env_db = os.environ.get("MEMORY_DB_PATH")
     if env_db:

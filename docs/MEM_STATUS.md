@@ -32,7 +32,7 @@ mem status --json
 Statistici de bază despre memoria permanentă:
 
 ```
-DB Path:     /home/sandu/.claude/memory/global.db
+DB Path:     /path/to/ean-agentos/global.db
 DB Size:     538.5 MB
 WAL Mode:    No
 Messages:    422,188
