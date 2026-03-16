@@ -1,59 +1,118 @@
-# 🤖 EAN AgentOS Pro — Multi-Agent Orchestration Demo
+# 🤖 EAN AgentOS Pro — Multi-Agent Demos
 
-> Real output from a live session. Claude Code orchestrates Gemini CLI, Kimi CLI, and Codex CLI.
-
-```
-============================================================
-🧠 EAN AgentOS — Multi-Agent Orchestration Demo
-============================================================
-
-📋 Project: Build a TODO REST API
-   Orchestrator: Claude Code (me)
-   Team: Gemini CLI, Kimi CLI, Codex CLI
-
-🤖 Asking gemini-cli...
-   ✅ gemini-cli says:
-      To thoroughly test a REST API /todos endpoint, I would implement
-      happy path unit tests for all CRUD operations, ensuring successful
-      data persistence for POST/PUT and correct status codes (200 OK,
-      201 Created). I would also prioritize negative tests for input
-      validation (e.g., 400 Bad Request for missing titles) and resource
-      discovery (404 Not Found for invalid IDs).
-
-🤖 Asking kimi-cli...
-   ✅ kimi-cli says:
-      Based on my analysis as a security analyst, here are the top
-      security risks for a todo REST API:
-      1. Broken Authentication/Authorization: Weak or missing auth
-         allows attackers to access other users' data (IDOR attacks)
-      2. Injection attacks: SQL injection, NoSQL injection
-      3. Missing rate limiting enables DoS attacks
-
-🤖 Asking codex-cli...
-   ✅ codex-cli says:
-      I'd standardize errors into a consistent response shape with an
-      HTTP status code, machine-readable error code, human-readable
-      message, and optional request ID so clients can handle failures
-      predictably. Separate client errors (400, 401, 403, 404, 422)
-      from server errors (500), validate input early, and avoid
-      leaking sensitive details.
-
-============================================================
-🧠 3 AI agents answered. Claude Code orchestrated.
-   All responses saved in shared memory.
-============================================================
-```
-
-## What happened:
-
-1. **Claude Code** (orchestrator) created the project and assigned roles
-2. **Gemini CLI** answered as testing expert — suggested unit tests for CRUD + validation
-3. **Kimi CLI** answered as security analyst — identified auth, injection, and DoS risks
-4. **Codex CLI** answered as backend developer — designed error handling strategy
-5. All responses were saved to the shared database
-
-Each agent brought a **different perspective** to the same project. This is the power of multi-agent orchestration.
+> All outputs below are **real** — recorded live from Claude Code orchestrating Gemini CLI, Kimi CLI, and Codex CLI.
 
 ---
 
-*This is a [Pro feature](mailto:ean@eanai.ro). The free version includes persistent memory, `mem suggest`, knowledge extraction, and more.*
+## Demo 1: Team Architecture Discussion
+
+> Claude Code assigns roles and asks each agent to contribute to a REST API project.
+
+```
+📋 Project: Build a TODO REST API
+   Orchestrator: Claude Code
+   Team: Gemini CLI, Kimi CLI, Codex CLI
+
+🤖 gemini-cli (Testing Expert):
+   To thoroughly test a REST API /todos endpoint, I would implement
+   happy path unit tests for all CRUD operations, ensuring successful
+   data persistence and correct status codes (200, 201). I would also
+   prioritize negative tests for input validation (400 Bad Request)
+   and resource discovery (404 Not Found for invalid IDs).
+
+🤖 kimi-cli (Security Analyst):
+   Top security risks for a todo REST API:
+   1. Broken Authentication/Authorization — weak or missing auth
+      allows IDOR attacks where users access other users' data
+   2. Injection attacks — SQL injection, NoSQL injection
+   3. Missing rate limiting enables DoS attacks
+
+🤖 codex-cli (Backend Developer):
+   I'd standardize errors into a consistent response shape with HTTP
+   status code, machine-readable error code, human-readable message,
+   and optional request ID. Separate client errors (400, 401, 403)
+   from server errors (500), validate input early, and avoid leaking
+   sensitive details.
+
+🧠 Result: 3 perspectives → testing + security + error handling
+   All saved to shared memory for future sessions.
+```
+
+---
+
+## Demo 2: AI Deliberation — SQL vs NoSQL
+
+> All 3 agents debate the same question. Each brings a different answer.
+
+```
+🗣️ Question: SQL or NoSQL for a real-time chat app?
+
+🤖 gemini-cli:
+   NoSQL — flexible schema handles varied message types, distributed
+   architecture allows horizontal scaling, optimized write performance
+   and low-latency retrieval are essential for real-time chat.
+
+🤖 kimi-cli:
+   NoSQL (MongoDB or Redis) — chat messages are self-contained,
+   write-heavy data with simple query patterns that benefit from
+   horizontal scalability and flexible schema.
+
+🤖 codex-cli:
+   SQL — chat systems need strong guarantees around message ordering,
+   user relationships, unread counts, and transactional updates.
+   A relational database handles those predictably with indexing
+   and partitioning.
+
+🧠 Claude Code (orchestrator):
+   Based on all 3 perspectives: NoSQL (MongoDB) for messages +
+   PostgreSQL for user accounts. Hybrid approach.
+
+📊 3 different opinions → 1 informed decision
+```
+
+---
+
+## Demo 3: Peer Review — Security Audit
+
+> All 3 agents review the same code and independently find the same vulnerability.
+
+```
+📋 Code: POST /api/login — no rate limiting, no account lockout
+
+🔍 gemini-cli:
+   Vulnerable to brute-force and credential stuffing attacks.
+   Fix: implement rate limiting by IP/account and account lockout
+   or progressive delays after multiple failures.
+
+🔍 kimi-cli:
+   Vulnerable to brute-force attacks — attackers can try unlimited
+   passwords without restriction.
+   Fix: max 5 attempts per IP/account per 15 minutes + progressive
+   delay + account lockout after threshold.
+
+🔍 codex-cli:
+   Vulnerable to brute-force and credential-stuffing. Fix with
+   per-IP and per-account rate limiting with exponential backoff
+   or temporary lockouts after N failures.
+
+🛡️ 3 reviewers independently found: missing rate limiting
+   Consensus: add rate limiting + account lockout
+   Vulnerability prevented before deployment.
+```
+
+---
+
+## What these demos show
+
+| Demo | What it proves |
+|------|---------------|
+| **Architecture** | Each agent brings a unique expertise (testing, security, backend) |
+| **Deliberation** | Agents can disagree (SQL vs NoSQL) — orchestrator synthesizes |
+| **Peer Review** | Multiple agents catch the same vulnerability independently |
+
+All outputs are saved to shared memory. What one agent learns, all agents remember.
+
+---
+
+*Multi-agent orchestration is a Pro feature. Contact: ean@eanai.ro*
+*The free version includes persistent memory, `mem suggest`, knowledge extraction, and more.*
