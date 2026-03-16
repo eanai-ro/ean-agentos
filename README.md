@@ -1,5 +1,10 @@
 # 🧠 EAN AgentOS
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
+[![Tests: 57 passing](https://img.shields.io/badge/Tests-57%20passing-brightgreen.svg)](test_full.sh)
+[![CLIs: Claude · Gemini · Codex · Kimi](https://img.shields.io/badge/CLIs-Claude%20·%20Gemini%20·%20Codex%20·%20Kimi-purple.svg)](#supported-clis)
+
 ### Persistent Memory for AI Coding Agents
 
 **Never solve the same bug twice.**
