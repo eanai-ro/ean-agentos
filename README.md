@@ -228,6 +228,23 @@ The Pro version adds **multi-agent orchestration** — coordinating multiple AI 
 
 ---
 
+## Live Demos
+
+Real output from multi-agent orchestration sessions — [see all demos](demos/README.md):
+
+| Demo | What it shows |
+|------|--------------|
+| [Architecture](demos/demo_architecture.md) | 3 agents design a REST API (testing + security + backend) |
+| [SQL vs NoSQL](demos/demo_database.md) | Agents debate, disagree, and reach consensus |
+| [Code Review](demos/demo_code_review.md) | 3 agents find the same vulnerability independently |
+| [Security Audit](demos/demo_security_audit.md) | SQL injection + weak JWT found by all 3 agents |
+| [VPS Hardening](demos/demo_vps_hardening.md) | Full deliberation: propose → critique → 16-point checklist |
+| [Debugging](demos/demo_debugging.md) | 3 agents diagnose a production memory leak |
+| [CI/CD Pipeline](demos/demo_cicd.md) | Agents design deployment pipeline together |
+| [Performance](demos/demo_performance.md) | 3 agents optimize a slow API endpoint |
+
+---
+
 ## License
 
 MIT — see [LICENSE](LICENSE)

@@ -6,115 +6,122 @@
 
 ## Round 1: Proposals
 
-### 🔐 gemini-cli — Full Hardening Plan
+### 🔐 gemini-cli — 8-Step Hardening Plan
 
-```bash
-# 1. Initial Access & User Management
-apt update && apt upgrade -y
-adduser sandu
-usermod -aG sudo sandu
-mkdir -p /home/sandu/.ssh
-# ssh-copy-id from local machine
+```
+1. User Management: adduser + sudo, SSH key auth
+2. SSH Hardening: Port 2222, PermitRootLogin no, PasswordAuthentication no,
+   PubkeyAuthentication yes, MaxAuthTries 3, AllowUsers sandu
+3. Firewall (UFW): default deny incoming, allow 2222/80/443
+4. Auto Updates: unattended-upgrades for security patches
+5. Fail2Ban: SSH brute-force protection on port 2222
+6. Kernel Hardening (sysctl): rp_filter, SYN cookies, log martians,
+   disable source routing, ignore ICMP broadcasts
+7. Secure Shared Memory: noexec,nosuid on /run/shm
+8. Auditing: auditd + lynis + logwatch
+```
 
-# 2. SSH Daemon Hardening (/etc/ssh/sshd_config)
-Port 2222
-PermitRootLogin no
-PasswordAuthentication no
-PubkeyAuthentication yes
-PermitEmptyPasswords no
-X11Forwarding no
-MaxAuthTries 3
-AllowUsers sandu
+### 🔐 kimi-cli — Automated Hardening Script
 
-# 3. Firewall (UFW)
-ufw default deny incoming
-ufw default allow outgoing
-ufw allow 2222/tcp
-ufw allow 80/tcp
-ufw allow 443/tcp
-ufw enable
+```
+Created a 27KB automated hardening script covering:
 
-# 4. Automatic Security Updates
-apt install unattended-upgrades -y
-dpkg-reconfigure -plow unattended-upgrades
+1. Authentication: root disabled, SSH keys only, account lockout after
+   5 failed attempts, 14+ char password policy
+2. SSH: modern crypto algorithms, 3 auth tries max, 5 min idle timeout,
+   TCP/X11 forwarding disabled, legal banner
+3. Firewall (UFW): default deny, SSH with rate limiting, IPv6 support
+4. Fail2ban: SSH protection + recidive filter for repeat offenders
+5. Kernel: ASLR enabled, core dumps disabled, protected hardlinks/symlinks,
+   SYN cookies, reverse path filtering
+6. File Integrity: AIDE with daily automated scans + email alerts
+7. Rootkit Detection: rkhunter + chkrootkit daily scans
+8. AppArmor profiles enforced
+```
 
-# 5. Brute-Force Protection
-apt install fail2ban -y
-cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-# Update [sshd] section: enabled=true, port=2222
+### 🔐 codex-cli — Operational Runbook
 
-# 6. Network Stack Hardening (sysctl.conf)
-net.ipv4.conf.all.rp_filter = 1
-net.ipv4.icmp_echo_ignore_broadcasts = 1
-net.ipv4.conf.all.accept_source_route = 0
-net.ipv4.tcp_syncookies = 1
-net.ipv4.conf.all.log_martians = 1
+```
+Pre-flight: provider snapshot + out-of-band console access
+Keep root SSH open until new user verified!
 
-# 7. Secure Shared Memory
-echo "tmpfs /run/shm tmpfs defaults,noexec,nosuid 0 0" >> /etc/fstab
-
-# 8. Auditing and Monitoring
-apt install auditd lynis logwatch -y
-lynis audit system
+1. Immediate updates: hostnamectl, timedatectl UTC, apt full-upgrade
+   Install: ufw fail2ban unattended-upgrades apparmor auditd aide
+2. Admin user: adduser + sudo + sshadmins group, SSH key setup
+3. SSH hardening: AllowGroups sshadmins, MaxAuthTries 3,
+   LoginGraceTime 30, ClientAliveInterval 300
+4. Firewall: ufw default deny, allow admin IP for SSH,
+   rate limit: ufw limit ssh/tcp
+5. Fail2ban: custom jail.local, progressive ban times
+6. Unattended-upgrades: security only, auto-reboot at 4AM if needed
+7. AppArmor: enforce all profiles
+8. Auditd: monitor /etc/passwd, /etc/shadow, sudoers changes
+9. AIDE: initialize database, daily cron checks
 ```
 
 ---
 
-## Round 2: Critique
+## Round 2: Mutual Critique
 
-### 💬 kimi-cli critiques gemini-cli:
+### 💬 kimi-cli critiques gemini + codex:
 
-> "The proposal omits critical steps: **AIDE or rkhunter** for intrusion detection, **backup strategy**, and **no mention of disabling IPv6** if not needed. I'd add file integrity monitoring and a regular backup rotation with offsite storage."
+> "Gemini's plan is solid but missing **intrusion detection** (AIDE/rkhunter), **backup strategy**, and **AppArmor** enforcement. Codex has the right idea with pre-flight safety but doesn't mention **kernel hardening** (sysctl) or **shared memory** protection."
 
-### 💬 codex-cli critiques gemini-cli:
+### 💬 codex-cli critiques gemini + kimi:
 
-> "Missing: verify SSH key access **before** closing root session (lockout risk). Add **ufw rate limiting**, remove unnecessary packages/services, and enable **unattended-upgrades for recovery**. No backup or disaster recovery plan mentioned."
+> "Both miss the critical step: **verify SSH key access in a new terminal BEFORE closing root**. Gemini should add **UFW rate limiting** (not just allow). Kimi's automated script is convenient but risky — one wrong step and you're locked out. Always test manually first."
+
+### 💬 gemini-cli critiques kimi + codex:
+
+> "Kimi's automated approach is efficient but lacks **manual verification steps**. Codex's runbook is thorough but should include **sysctl kernel hardening** and **shared memory restrictions**. Neither mentions **logwatch** for daily log summaries."
 
 ---
 
 ## Round 3: Synthesis
 
-### 🧠 Claude Code — Final VPS Hardening Checklist
+### 🧠 Claude Code — Final 16-Point VPS Hardening Checklist
 
-Based on all proposals + critiques, consensus plan:
+Based on all 3 proposals + mutual critiques:
 
 **IMMEDIATE (first 5 minutes):**
 1. `apt update && apt full-upgrade -y`
 2. `adduser admin && usermod -aG sudo admin`
-3. SSH: `PermitRootLogin no`, `PasswordAuthentication no`, `Port 2222`
-4. `ufw default deny incoming && ufw allow 2222/tcp && ufw allow 80,443/tcp && ufw enable`
+3. SSH keys: copy public key, verify login in NEW terminal
+4. SSH: `PermitRootLogin no`, `PasswordAuthentication no`, `Port 2222`
+5. `ufw default deny incoming && ufw allow 2222/tcp && ufw enable`
 
 **ESSENTIAL (first hour):**
-5. `apt install fail2ban -y` (brute-force protection)
-6. `apt install unattended-upgrades -y` (auto security patches)
-7. Configure sysctl: disable IP forwarding, enable SYN cookies
-8. Install auditd for system call auditing
+6. `apt install fail2ban -y` + configure SSH jail
+7. `apt install unattended-upgrades -y` (security patches only)
+8. Kernel hardening via sysctl (SYN cookies, rp_filter, log martians)
+9. Secure shared memory: noexec,nosuid on /run/shm
 
 **HARDENING (first day):**
-9. Remove unused packages and services
-10. Configure logwatch for log monitoring
-11. Set up AIDE (file integrity monitoring) ← *from kimi-cli critique*
-12. Kernel hardening via sysctl.conf ← *from gemini-cli*
-13. Secure shared memory (noexec /run/shm)
+10. Install + configure auditd (monitor passwd, shadow, sudoers)
+11. Install AIDE for file integrity monitoring ← *from kimi-cli*
+12. Install rkhunter for rootkit detection ← *from kimi-cli*
+13. Enforce AppArmor profiles ← *from codex-cli*
+14. Install logwatch for daily log summaries ← *from gemini-cli*
 
 **MONITORING (ongoing):**
-14. Regular security audits with `lynis`
-15. Configure alerting for suspicious activity
+15. Regular security audits with `lynis audit system`
 16. Backup strategy with offsite rotation ← *from codex-cli critique*
 
-**Added from critiques:**
-- ✓ Intrusion detection AIDE/rkhunter (kimi-cli)
-- ✓ Backup strategy (codex-cli)
-- ✓ Verify SSH before closing root (codex-cli)
-- ✓ Kernel hardening (gemini-cli)
+**Key insight from critiques:**
+- ✓ Always verify SSH in new terminal before closing root (codex-cli)
+- ✓ Take provider snapshot before starting (codex-cli)
+- ✓ Intrusion detection AIDE + rkhunter (kimi-cli)
+- ✓ Kernel hardening sysctl (gemini-cli)
+- ✓ AppArmor enforcement (kimi-cli + codex-cli)
+- ✓ Logwatch for visibility (gemini-cli)
 
 ---
 
 ## Key Takeaway
 
-> No single agent covered all 16 points. The **combination of proposals + mutual critique** produced a checklist that's more comprehensive than any individual recommendation.
+> No single agent covered all 16 points. Gemini focused on **network hardening**, Kimi on **intrusion detection**, Codex on **operational safety**. The mutual critiques filled gaps that each agent missed.
 
-This is the power of multi-agent deliberation.
+This is the power of multi-agent deliberation with peer review.
 
 ---
 
