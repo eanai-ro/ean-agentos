@@ -405,7 +405,7 @@ License activated via `~/.ean-memory/license.key` (JSON or JWT).
 }
 ```
 
-**Details**: [ean-agentos.dev/pro](https://ean-agentos.dev/pro)
+**Details**: [ean@eanai.ro](mailto:ean@eanai.ro)
 
 ---
 

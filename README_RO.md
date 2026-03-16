@@ -200,7 +200,7 @@ Versiunea Pro adaugă **orchestrare multi-agent** — coordonarea mai multor CLI
 | 📼 **Replay System** | Timeline complete proiecte + deliberări |
 | 📋 **Peer Review** | Verdicte formale, auto-fix |
 
-**Detalii**: [ean-agentos.dev/pro](https://ean-agentos.dev/pro)
+**Detalii**: [ean@eanai.ro](mailto:ean@eanai.ro)
 
 ---
 

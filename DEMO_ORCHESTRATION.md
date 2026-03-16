@@ -56,4 +56,4 @@ Each agent brought a **different perspective** to the same project. This is the 
 
 ---
 
-*This is a [Pro feature](https://ean-agentos.dev/pro). The free version includes persistent memory, `mem suggest`, knowledge extraction, and more.*
+*This is a [Pro feature](mailto:ean@eanai.ro). The free version includes persistent memory, `mem suggest`, knowledge extraction, and more.*

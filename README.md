@@ -224,7 +224,7 @@ The Pro version adds **multi-agent orchestration** — coordinating multiple AI 
 | 📼 **Replay System** | Complete project + deliberation timelines |
 | 📋 **Peer Review** | Formal verdicts, auto-fix |
 
-**Details**: [ean-agentos.dev/pro](https://ean-agentos.dev/pro)
+**Details**: [ean@eanai.ro](mailto:ean@eanai.ro)
 
 ---
 

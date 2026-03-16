@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""EAN AgentOS Pro feature. Upgrade at: https://ean-agentos.dev/pro"""
+"""EAN AgentOS Pro feature. Upgrade at: mailto:ean@eanai.ro"""
 
-_MSG = "\n  ⚠️  This feature requires EAN AgentOS Pro.\n  Upgrade at: https://ean-agentos.dev/pro\n"
+_MSG = "\n  ⚠️  This feature requires EAN AgentOS Pro.\n  Upgrade at: mailto:ean@eanai.ro\n"
 
 def _pro(*args, **kwargs):
     print(_MSG)

@@ -1,0 +1,12 @@
+{"version": 2, "width": 80, "height": 24, "timestamp": 1773687455, "env": {"SHELL": null, "TERM": null}, "title": "EAN AgentOS — Never solve the same bug twice"}
+[0.00472, "o", "\r\n🧠 EAN AgentOS — Demo\r\n   Never solve the same bug twice.\r\n\r\n"]
+[2.007376, "o", "📝 Session 1: Saving solutions from past debugging sessions...\r\n"]
+[3.085324, "o", "  ✅ 5 solutions saved from past sessions\r\n"]
+[5.091967, "o", "\r\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\r\n\r\n📝 Session 2: 3 months later... same errors appear\r\n\r\n"]
+[7.094622, "o", "$ mem suggest \"CORS error\"\r\n\r\n"]
+[8.141448, "o", "\r\n💡 SOLUTIONS FOR: CORS error\r\n======================================================================\r\n\r\n  1. [32pts] ✅  error_resolutions#1\r\n     Problem:  CORS error: blocked by CORS policy - No Access-Control-Allow-Origin header\r\n     Solution: Add flask-cors middleware and configure CORS(app, resources)\r\n     Code:     pip install flask-cors from flask_cors import CORS CORS(app)\r\n     Match: 100.0% | Confidence: 53.0% | Reuse: 0 | Agent: claude-code\r\n\r\n  Total: 1 solutions found\r\n"]
+[11.148343, "o", "\r\n$ mem suggest \"module not found redis\"\r\n\r\n"]
+[12.19089, "o", "\r\n💡 SOLUTIONS FOR: module not found redis\r\n======================================================================\r\n\r\n  1. [32pts] ✅  error_resolutions#2\r\n     Problem:  ModuleNotFoundError: No module named redis\r\n     Solution: Install redis package with pip\r\n     Code:     pip install redis\r\n     Match: 40.0% | Confidence: 53.0% | Reuse: 0 | Agent: gemini-cli\r\n\r\n  Total: 1 solutions found\r\n"]
+[15.197673, "o", "\r\n$ mem suggest \"docker permission denied\"\r\n\r\n"]
+[16.247589, "o", "\r\n💡 SOLUTIONS FOR: docker permission denied\r\n======================================================================\r\n\r\n  1. [37pts] ✅  error_resolutions#5\r\n     Problem:  PermissionError: docker.sock permission denied - Cannot connect to Docker daemon\r\n     Solution: Add user to docker group and restart session\r\n     Code:     sudo usermod -aG docker $USER newgrp docker\r\n     Match: 33.3% | Confidence: 61.0% | Reuse: 0 | Agent: kimi-cli\r\n\r\n  Total: 1 solutions found\r\n"]
+[19.258734, "o", "\r\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\r\n\r\n🧠 Never solve the same bug twice.\r\n   https://github.com/eanai-ro/ean-agentos\r\n\r\n"]

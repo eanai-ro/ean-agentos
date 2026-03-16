@@ -596,7 +596,7 @@ Format: JSON sau JWT.
 }
 ```
 
-**Detalii**: [ean-agentos.dev/pro](https://ean-agentos.dev/pro)
+**Detalii**: [ean@eanai.ro](mailto:ean@eanai.ro)
 
 ---
 

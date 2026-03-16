@@ -3,7 +3,7 @@
 EAN AgentOS Pro — Multi-Agent Orchestration
 
 This feature requires an EAN AgentOS Pro license.
-Upgrade at: https://ean-agentos.dev/pro
+Upgrade at: mailto:ean@eanai.ro
 
 Pro includes:
 - Multi-agent orchestration (projects, tasks, lease-based ownership)
@@ -18,7 +18,7 @@ Pro includes:
 import sys
 from typing import Optional, List
 
-_MSG = "\n  ⚠️  Multi-agent orchestration requires EAN AgentOS Pro.\n  Upgrade at: https://ean-agentos.dev/pro\n"
+_MSG = "\n  ⚠️  Multi-agent orchestration requires EAN AgentOS Pro.\n  Upgrade at: mailto:ean@eanai.ro\n"
 
 # CLI Profiles (public — used by routing hints in free version)
 CLI_PROFILES = {
@@ -31,7 +31,7 @@ CLI_PROFILES = {
 
 def _pro(*args, **kwargs):
     print(_MSG)
-    return {"error": "Requires EAN AgentOS Pro", "upgrade": "https://ean-agentos.dev/pro"}
+    return {"error": "Requires EAN AgentOS Pro", "upgrade": "mailto:ean@eanai.ro"}
 
 
 # Stub all public functions
