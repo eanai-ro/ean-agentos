@@ -108,10 +108,10 @@ Rulează `PRAGMA quick_check` pentru verificare rapidă a integrității DB.
 mem backup
 
 # Încearcă repair
-sqlite3 ~/.claude/memory/global.db "PRAGMA integrity_check"
+sqlite3 ./global.db "PRAGMA integrity_check"
 
 # Dacă nu merge, restore din ultimul backup
-cp ~/.claude/memory/backups/$(ls -t ~/.claude/memory/backups | head -1)/global.db ~/.claude/memory/
+cp ./backups/$(ls -t ./backups | head -1)/global.db ./
 ```
 
 ### 2. FTS5 Full-Text Search
@@ -128,7 +128,7 @@ Verifică:
 **Remediere** (dacă warn/fail):
 ```bash
 # Re-populează FTS
-cd ~/.claude/memory
+cd /path/to/ean-agentos
 sqlite3 global.db < migrations/002_fts5_search.sql
 ```
 
@@ -168,13 +168,13 @@ Verifică spațiul disponibil pe partiția cu memorie permanentă.
 **Remediere** (dacă warn):
 ```bash
 # Curățare snapshot-uri vechi
-find ~/.claude/memory/backups -type d -name "2*" -mtime +7 -exec rm -rf {} \;
+find ./backups -type d -name "2*" -mtime +7 -exec rm -rf {} \;
 
 # Verifică dimensiune DB
-du -sh ~/.claude/memory/global.db
+du -sh ./global.db
 
 # Opțional: compact manual (dacă e mare)
-sqlite3 ~/.claude/memory/global.db "VACUUM"
+sqlite3 ./global.db "VACUUM"
 ```
 
 ### 6. PreCompact Hook

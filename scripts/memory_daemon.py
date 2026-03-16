@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Memory Daemon pentru Claude Code - Salvează TOTUL în memorie permanentă.
+Memory Daemon pentru Claude Code - Salvează TOTUL în EAN AgentOS persistent memory.
 
 Acest script este apelat de hooks-urile Claude Code pentru:
 - SessionStart: Începe o sesiune nouă
@@ -29,7 +29,7 @@ import time
 
 # === CONFIGURAȚIE ===
 # MEMORY_DIR is configurable via env var. Hooks set this to the project root.
-# Default: project root (ean-cc-mem-kit/).
+# Default: project root (ean-agentos/).
 _DAEMON_PROJECT_ROOT = Path(__file__).resolve().parent.parent
 MEMORY_DIR = Path(os.environ.get("MEMORY_DIR", str(_DAEMON_PROJECT_ROOT)))
 GLOBAL_DB = MEMORY_DIR / "global.db"

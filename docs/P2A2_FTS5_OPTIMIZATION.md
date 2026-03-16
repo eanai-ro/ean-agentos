@@ -69,4 +69,4 @@ telegram debounce:       0.08s ⚡
 
 ---
 **Implementat de:** Claude Sonnet 4.5  
-**Fișier modificat:** `~/.claude/memory/scripts/search_memory.py`
+**Fișier modificat:** `scripts/search_memory.py`

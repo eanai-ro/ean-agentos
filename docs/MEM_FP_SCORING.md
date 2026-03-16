@@ -350,7 +350,7 @@ mem fp rules --pattern generic_token
 
 # 3. Dacă FP > 80% → Ajustează weight
 # Manual în DB sau prin admin tool:
-sqlite3 ~/.claude/memory/global.db "UPDATE detection_rules SET weight = 20 WHERE pattern_id = 'generic_token'"
+sqlite3 ./global.db "UPDATE detection_rules SET weight = 20 WHERE pattern_id = 'generic_token'"
 
 # 4. Re-test detecții
 mem fp search generic_token | head -20
@@ -365,13 +365,13 @@ mem fp search generic_token | head -20
 mem fp rules --pattern bearer_auth
 
 # 2. Disable temporar
-sqlite3 ~/.claude/memory/global.db "UPDATE detection_rules SET enabled = 0 WHERE pattern_id = 'bearer_auth'"
+sqlite3 ./global.db "UPDATE detection_rules SET enabled = 0 WHERE pattern_id = 'bearer_auth'"
 
 # 3. Verifică
 mem fp rules | grep bearer_auth  # Should show ❌
 
 # 4. Re-enable după teste
-sqlite3 ~/.claude/memory/global.db "UPDATE detection_rules SET enabled = 1 WHERE pattern_id = 'bearer_auth'"
+sqlite3 ./global.db "UPDATE detection_rules SET enabled = 1 WHERE pattern_id = 'bearer_auth'"
 ```
 
 ### 3. Identificare Top False Positives
@@ -569,10 +569,10 @@ mem fp rules
 **Soluție:**
 ```bash
 # 1. Reduce weight
-sqlite3 ~/.claude/memory/global.db "UPDATE detection_rules SET weight = 20 WHERE pattern_id = 'generic_token'"
+sqlite3 ./global.db "UPDATE detection_rules SET weight = 20 WHERE pattern_id = 'generic_token'"
 
 # 2. Sau disable temporar
-sqlite3 ~/.claude/memory/global.db "UPDATE detection_rules SET enabled = 0 WHERE pattern_id = 'generic_token'"
+sqlite3 ./global.db "UPDATE detection_rules SET enabled = 0 WHERE pattern_id = 'generic_token'"
 
 # 3. Adaugă excludes în PANIC_EXCLUDES (mem_panic.py) sau GUARD_EXCLUDES (memory_daemon.py)
 ```
@@ -587,7 +587,7 @@ sqlite3 ~/.claude/memory/global.db "UPDATE detection_rules SET enabled = 0 WHERE
 echo $MEMORY_SCRUB_DISABLE  # Trebuie 0 sau nesetat
 
 # Verifică că scrub_text() apelează detection_event_write()
-grep -A 20 "def scrub_text" ~/.claude/memory/scripts/memory_daemon.py | grep detection_event
+grep -A 20 "def scrub_text" scripts/memory_daemon.py | grep detection_event
 ```
 
 ## Vezi și

@@ -34,7 +34,7 @@ mem backup --keep 7 --json
 ### Structura snapshot
 
 ```
-~/.claude/memory/backups/
+./backups/
 └── 20260207_231511/
     ├── global.db                    # Baza de date (atomic backup)
     ├── global.db-wal               # WAL file (dacă există)
@@ -73,21 +73,21 @@ Fiecare snapshot include un `manifest.json` cu:
 pkill -f memory_daemon.py
 
 # Backup DB curent (safety)
-cp ~/.claude/memory/global.db ~/.claude/memory/global.db.before_restore
+cp ./global.db ./global.db.before_restore
 
 # Restore din snapshot
-SNAPSHOT="~/.claude/memory/backups/20260207_231511"
-cp $SNAPSHOT/global.db ~/.claude/memory/global.db
+SNAPSHOT="./backups/20260207_231511"
+cp $SNAPSHOT/global.db ./global.db
 
 # Restart daemon
-python3 ~/.claude/memory/scripts/memory_daemon.py &
+python3 scripts/memory_daemon.py &
 ```
 
 ### 2. Restore git repository
 
 ```bash
 # Clone din bundle într-un dir temporar
-SNAPSHOT="~/.claude/memory/backups/20260207_231511"
+SNAPSHOT="./backups/20260207_231511"
 git clone $SNAPSHOT/repo.bundle /tmp/memory_restored
 
 # Verifică conținut
@@ -95,26 +95,26 @@ cd /tmp/memory_restored
 git log --oneline -5
 
 # Dacă e OK, copiază back
-rm -rf ~/.claude/memory/.git
-cp -a /tmp/memory_restored/.git ~/.claude/memory/
+rm -rf ./.git
+cp -a /tmp/memory_restored/.git ./
 ```
 
 ### 3. Restore state files
 
 ```bash
-SNAPSHOT="~/.claude/memory/backups/20260207_231511"
+SNAPSHOT="./backups/20260207_231511"
 
 # Backup state-uri curente
-cd ~/.claude/memory
+cd /path/to/ean-agentos
 for f in .reconciler_state.json .monitor_state.json .context_monitor_state.json .tg_alert_state.json; do
     [ -f "$f" ] && cp "$f" "${f}.before_restore"
 done
 
 # Restore din snapshot
-cp $SNAPSHOT/.reconciler_state.json ~/.claude/memory/
-cp $SNAPSHOT/.monitor_state.json ~/.claude/memory/
-cp $SNAPSHOT/.context_monitor_state.json ~/.claude/memory/
-[ -f "$SNAPSHOT/.tg_alert_state.json" ] && cp $SNAPSHOT/.tg_alert_state.json ~/.claude/memory/
+cp $SNAPSHOT/.reconciler_state.json ./
+cp $SNAPSHOT/.monitor_state.json ./
+cp $SNAPSHOT/.context_monitor_state.json ./
+[ -f "$SNAPSHOT/.tg_alert_state.json" ] && cp $SNAPSHOT/.tg_alert_state.json ./
 ```
 
 ## Automatizare
@@ -134,7 +134,7 @@ crontab -e
 ```ini
 # /etc/systemd/user/mem-backup.service
 [Unit]
-Description=Claude Memory Backup Service
+Description=EAN AgentOS Backup Service
 
 [Service]
 Type=oneshot
@@ -144,7 +144,7 @@ StandardError=journal
 
 # /etc/systemd/user/mem-backup.timer
 [Unit]
-Description=Claude Memory Backup Timer (Daily)
+Description=EAN AgentOS Backup Timer (Daily)
 
 [Timer]
 OnCalendar=daily
@@ -166,18 +166,18 @@ systemctl --user status mem-backup.timer
 
 ```bash
 # Listare snapshot-uri
-ls -lth ~/.claude/memory/backups/
+ls -lth ./backups/
 
 # Verifică ultimul snapshot
-LAST=$(ls -t ~/.claude/memory/backups/ | head -1)
+LAST=$(ls -t ./backups/ | head -1)
 echo "Ultimul backup: $LAST"
-cat ~/.claude/memory/backups/$LAST/manifest.json | jq
+cat ./backups/$LAST/manifest.json | jq
 
 # Verifică integritate DB din snapshot
-sqlite3 ~/.claude/memory/backups/$LAST/global.db "PRAGMA integrity_check"
+sqlite3 ./backups/$LAST/global.db "PRAGMA integrity_check"
 
 # Verifică git bundle
-git bundle verify ~/.claude/memory/backups/$LAST/repo.bundle
+git bundle verify ./backups/$LAST/repo.bundle
 ```
 
 ## Metrici

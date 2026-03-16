@@ -305,7 +305,7 @@ except ImportError:
 def _require_orch():
     """Check orchestration license for MCP tools."""
     if not _check_orch_premium("orchestration"):
-        return {"error": "Premium feature. Orchestration requires ean-cc-mem-kit Pro license.",
+        return {"error": "Premium feature. Orchestration requires ean-agentos Pro license.",
                 "upgrade_url": "https://ean-memory.dev/pro"}
     return None
 

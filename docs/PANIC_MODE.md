@@ -70,7 +70,7 @@ mem panic panic --scan-only
    HIGH: 140
    MEDIUM: 219
 
-📄 Report: ~/.claude/memory/docs/PANIC_REPORT_20260207_234725.md
+📄 Report: ./docs/PANIC_REPORT_20260207_234725.md
 ```
 
 ### 2. mem panic panic --fix - Automated Remediation (EXPERIMENTAL)
@@ -107,8 +107,8 @@ mem panic status
 ✅ Status: INACTIVE
 
 📄 Recent Reports (2):
-   - 20260207_234725: ~/.claude/memory/docs/PANIC_REPORT_20260207_234725.md
-   - 20260207_120530: ~/.claude/memory/docs/PANIC_REPORT_20260207_120530.md
+   - 20260207_234725: ./docs/PANIC_REPORT_20260207_234725.md
+   - 20260207_120530: ./docs/PANIC_REPORT_20260207_120530.md
 ```
 
 ### 4. mem panic resume - Repornire din Panic Mode
@@ -256,7 +256,7 @@ MEMORY_PANIC_ALLOW_FIX=1 mem panic panic --fix
 mem panic panic --scan-only
 
 # 2. Review raport
-cat ~/.claude/memory/docs/PANIC_REPORT_$(ls -t ~/.claude/memory/docs/PANIC_REPORT_*.md | head -1 | xargs basename)
+cat ./docs/PANIC_REPORT_$(ls -t ./docs/PANIC_REPORT_*.md | head -1 | xargs basename)
 
 # 3. Dacă ai găsit secrete reale:
 #    - Identifică cum au trecut de scrubbing/guard
@@ -302,15 +302,15 @@ pkill -f memory_daemon.py
 
 # 3. Restore DB
 BACKUP_DIR="/tmp/claude_PANIC_20260207_234649"
-cp $BACKUP_DIR/global.db ~/.claude/memory/global.db
-cp $BACKUP_DIR/global.db-wal ~/.claude/memory/global.db-wal  # dacă există
-cp $BACKUP_DIR/global.db-shm ~/.claude/memory/global.db-shm  # dacă există
+cp $BACKUP_DIR/global.db ./global.db
+cp $BACKUP_DIR/global.db-wal ./global.db-wal  # dacă există
+cp $BACKUP_DIR/global.db-shm ./global.db-shm  # dacă există
 
 # 4. Verifică integritate
-sqlite3 ~/.claude/memory/global.db "PRAGMA integrity_check"
+sqlite3 ./global.db "PRAGMA integrity_check"
 
 # 5. Restart daemon
-python3 ~/.claude/memory/scripts/memory_daemon.py &
+python3 scripts/memory_daemon.py &
 ```
 
 ## Limitări
@@ -338,7 +338,7 @@ Pentru protecție completă:
 1. **Pre-commit hooks** - git pre-commit cu `gitleaks` sau `truffleHog`
 2. **Regular audits** - `mem panic panic --scan-only` lunar
 3. **Secret rotation** - Rotește secretele periodic (best practice)
-4. **Access control** - Permisiuni stricte pe `~/.claude/memory/`
+4. **Access control** - Permisiuni stricte pe `./`
 
 ## Performance
 

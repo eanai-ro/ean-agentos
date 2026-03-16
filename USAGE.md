@@ -253,13 +253,13 @@ mem reconcile
 ### 3. Menținere DB
 ```bash
 # Periodic rulează optimize (safe)
-~/.claude/memory/scripts/p2_safe_optimize.sh
+scripts/p2_safe_optimize.sh
 ```
 
 ### 4. Backup
 ```bash
 # Backup manual DB
-cp ~/.claude/memory/global.db ~/backups/global_$(date +%Y%m%d).db
+cp ./global.db ~/backups/global_$(date +%Y%m%d).db
 ```
 
 ## ⚡ Tips & Tricks

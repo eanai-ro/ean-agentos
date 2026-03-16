@@ -94,7 +94,7 @@ unset MEMORY_SCRUB_DISABLE
 Creează fișier whitelist pentru a exclude pattern-uri cunoscute safe:
 
 ```bash
-# ~/.claude/memory/scrub_whitelist.txt
+# ./scrub_whitelist.txt
 toolu_[A-Za-z0-9]+
 [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
 test_token_safe
@@ -104,7 +104,7 @@ test_token_safe
 
 **Exemplu utilizare**:
 ```bash
-cat > ~/.claude/memory/scrub_whitelist.txt <<EOF
+cat > ./scrub_whitelist.txt <<EOF
 toolu_[A-Za-z0-9]+
 test_api_key_[0-9]+
 EOF
@@ -122,7 +122,7 @@ export MEMORY_SCRUB_DEBUG=1
 say "Test: sk-1234567890abcdef1234567890abcdef1234567890abcdef"
 
 # Verifică în DB
-sqlite3 ~/.claude/memory/global.db \
+sqlite3 ./global.db \
   "SELECT content FROM messages WHERE content LIKE '%REDACTED%' ORDER BY id DESC LIMIT 1"
 
 # Output așteptat:
@@ -136,7 +136,7 @@ sqlite3 ~/.claude/memory/global.db \
 echo 'curl -H "Authorization: Bearer sk-test123456789"' | say
 
 # Verifică în bash_history
-sqlite3 ~/.claude/memory/global.db \
+sqlite3 ./global.db \
   "SELECT command FROM bash_history WHERE command LIKE '%REDACTED%' ORDER BY id DESC LIMIT 1"
 ```
 
@@ -150,7 +150,7 @@ export MEMORY_SCRUB_DISABLE=1
 say "Test disable: sk-fake123456"
 
 # Verifică că NU e scrubbed
-sqlite3 ~/.claude/memory/global.db \
+sqlite3 ./global.db \
   "SELECT content FROM messages WHERE content LIKE '%fake123456%' ORDER BY id DESC LIMIT 1"
 
 # Re-enable
@@ -261,7 +261,7 @@ Dacă ai secrete deja în DB, rulează migration:
 mem backup
 
 # Script manual pentru re-scrub date existente
-sqlite3 ~/.claude/memory/global.db <<EOF
+sqlite3 ./global.db <<EOF
 -- Nu există migration automată deocamdată
 -- Contactează admin pentru script custom
 EOF

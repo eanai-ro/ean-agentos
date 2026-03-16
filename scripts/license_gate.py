@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-License Gate — Feature gating pentru ean-cc-mem-kit Pro
+License Gate — Feature gating pentru ean-agentos Pro
 
 Verifică licență JWT offline. Fără server, fără DRM agresiv.
 
@@ -151,7 +151,7 @@ def require_premium(feature: str = "orchestration"):
     """Verifică și oprește dacă nu are licență. Folosit în CLI."""
     if not check_premium(feature):
         plan = get_plan()
-        print(f"\n  ⚠️  This feature requires ean-cc-mem-kit Pro ({feature}).")
+        print(f"\n  ⚠️  This feature requires ean-agentos Pro ({feature}).")
         print(f"  Current plan: {plan}")
         print(f"  Get your license at: https://ean-memory.dev/pro")
         print(f"  Activate: place license.key in ~/.ean-memory/license.key\n")

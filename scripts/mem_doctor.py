@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-mem_doctor.py - Health check rapid pentru sistemul de memorie permanentă
+mem_doctor.py - Health check rapid pentru sistemul de EAN AgentOS persistent memory
 Target: sub 2s execuție, 6 verificări
 """
 

@@ -1,4 +1,4 @@
-# DEV_LOG — Universal Agent Memory (ean-cc-mem-kit)
+# DEV_LOG — Universal Agent Memory (ean-agentos)
 
 Jurnal de dezvoltare cu toate modificările semnificative.
 
@@ -317,8 +317,8 @@ type_weight:        0.8-1.2 (decision=1.2, resolution=1.1, fact=1.0, goal=0.9, t
 ### Modificări
 
 **DB Unification**
-- Toate componentele folosesc acum DB din project root (`ean-cc-mem-kit/global.db`)
-- Schimbat default MEMORY_DIR de la `~/.claude/memory` la project root
+- Toate componentele folosesc acum DB din project root (`ean-agentos/global.db`)
+- Schimbat default MEMORY_DIR de la `project root` la project root
 - Fișiere modificate:
   - `scripts/memory_daemon.py` — _DAEMON_PROJECT_ROOT
   - `scripts/codex_rollout_watcher.py` — _PROJECT_ROOT, STATE_FILE, MEMORY_DIR

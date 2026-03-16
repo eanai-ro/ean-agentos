@@ -344,7 +344,7 @@ Pentru protecție completă:
 1. **Pre-commit hooks** - Scan secrets înainte de git push
 2. **Periodic audit** - `mem search` pentru pattern-uri suspect
 3. **Backup encrypt** - Encrypt backup-uri cu `mem backup`
-4. **Access control** - Permisiuni stricte pe `~/.claude/memory/`
+4. **Access control** - Permisiuni stricte pe `./`
 
 ## Troubleshooting
 
@@ -373,7 +373,7 @@ python3 -c "import os; print(os.environ.get('MEMORY_GUARD_ENABLE', '1'))"
 # Should print: 1
 
 # Check pattern-uri
-grep "GUARD_PATTERNS" ~/.claude/memory/scripts/memory_daemon.py
+grep "GUARD_PATTERNS" scripts/memory_daemon.py
 ```
 
 ### Quarantine Plin

@@ -9,8 +9,8 @@
 ## Installation
 
 ```bash
-git clone <repo-url> ean-cc-mem-kit
-cd ean-cc-mem-kit
+git clone <repo-url> ean-agentos
+cd ean-agentos
 
 # Install Python dependencies
 pip install flask

@@ -404,10 +404,10 @@ Pentru automation și integrare:
 **Soluție:**
 ```bash
 # Verifică dacă tabelul există
-sqlite3 ~/.claude/memory/global.db "SELECT COUNT(*) FROM audit_log"
+sqlite3 ./global.db "SELECT COUNT(*) FROM audit_log"
 
 # Dacă eroare → aplică migrația 006
-sqlite3 ~/.claude/memory/global.db < ~/.claude/memory/migrations/006_observability_tables.sql
+sqlite3 ./global.db < ./migrations/006_observability_tables.sql
 ```
 
 ### Events lipsă pentru scrubbing
@@ -420,7 +420,7 @@ sqlite3 ~/.claude/memory/global.db < ~/.claude/memory/migrations/006_observabili
 echo $MEMORY_SCRUB_DISABLE  # Trebuie 0 sau nesetat
 
 # Verifică că scrub_text() apelează audit_log_write()
-grep -A 10 "def scrub_text" ~/.claude/memory/scripts/memory_daemon.py | grep audit_log
+grep -A 10 "def scrub_text" scripts/memory_daemon.py | grep audit_log
 ```
 
 ### JSON parsing erori

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Inițializare bază de date SQLite pentru sistemul de memorie permanentă Claude Code.
+Inițializare bază de date SQLite pentru sistemul de EAN AgentOS.
 Creează schema pentru global.db și project.db.
 """
 

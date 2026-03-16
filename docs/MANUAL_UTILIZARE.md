@@ -15,7 +15,7 @@
 
 ```bash
 # 1. Clonează / copiază proiectul
-cd /path/to/ean-cc-mem-kit
+cd /path/to/ean-agentos
 
 # 2. Instalează dependențele
 pip install -r requirements.txt
@@ -172,7 +172,7 @@ curl -X POST http://localhost:19876/api/v1/decisions \
     "title": "Folosim SQLite",
     "description": "Simplu, embedded, fără server",
     "category": "technical",
-    "project_path": "/mnt/lucru/proiecte/claude/ean-cc-mem-kit"
+    "project_path": "/mnt/lucru/proiecte/claude/ean-agentos"
   }'
 ```
 

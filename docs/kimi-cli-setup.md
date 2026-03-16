@@ -15,7 +15,7 @@ Kimi CLI suportă MCP nativ. Nu ai nevoie de adapter separat — conectezi direc
 ### 1. Pornește serverul
 
 ```bash
-cd /path/to/ean-cc-mem-kit
+cd /path/to/ean-agentos
 python3 scripts/web_server.py
 # Server runs on http://localhost:19876
 ```
@@ -30,7 +30,7 @@ kimi mcp add --transport stdio \
   -e "MEMORY_MODEL_NAME=kimi-k2.5" \
   -e "MEMORY_PROVIDER=moonshot" \
   universal-memory \
-  -- python3 /path/to/ean-cc-mem-kit/mcp_server/server.py
+  -- python3 /path/to/ean-agentos/mcp_server/server.py
 ```
 
 ### 3. Verifică conexiunea
@@ -61,7 +61,7 @@ Editează `~/.kimi/mcp.json`:
   "mcpServers": {
     "universal-memory": {
       "command": "python3",
-      "args": ["/path/to/ean-cc-mem-kit/mcp_server/server.py"],
+      "args": ["/path/to/ean-agentos/mcp_server/server.py"],
       "env": {
         "MEMORY_BASE_URL": "http://localhost:19876",
         "MEMORY_PROJECT_PATH": "/path/to/your/project",

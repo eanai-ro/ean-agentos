@@ -1,4 +1,4 @@
-# PROJECT_STATE — Universal Agent Memory (ean-cc-mem-kit)
+# PROJECT_STATE — Universal Agent Memory (ean-agentos)
 
 **Versiune curentă:** v1.3
 **Ultima actualizare:** 2026-03-15
@@ -165,7 +165,7 @@
 ## Probleme Cunoscute
 
 1. **Web server persistence** — Serverul trebuie pornit manual; nu există systemd service
-2. **web_server.py default DB** — Încă are default `~/.claude/memory/global.db`; necesită env var
+2. **web_server.py default DB** — Încă are default `./global.db`; necesită env var
 3. **Schema consistency** — Unele tabele nu au `model_used` (goals, learned_facts)
 4. **Soft delete** — Nu există; ștergerea este permanentă
 

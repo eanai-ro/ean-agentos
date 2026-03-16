@@ -116,7 +116,7 @@ run("T1: mem dashboard rulează", t1_dashboard)
 
 def t2_with_data():
     output = run_mem("dashboard")
-    assert "ean-cc-mem-kit" in output or PROJECT_PATH.split("/")[-1] in output, f"Project name missing"
+    assert "ean-agentos" in output or PROJECT_PATH.split("/")[-1] in output, f"Project name missing"
 run("T2: Dashboard cu date proiect curent", t2_with_data)
 
 def t3_empty():

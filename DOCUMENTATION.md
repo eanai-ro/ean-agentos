@@ -118,7 +118,7 @@ Am construit un **sistem de memorie permanentă** care:
 ### Directoare și Fișiere
 
 ```
-~/.claude/memory/
+./
 ├── global.db                    # Baza de date principală (156 MB)
 ├── .current_session             # ID-ul sesiunii curente
 ├── .monitor_state.json          # Starea monitorului realtime
@@ -422,10 +422,10 @@ ORDER BY usage_count DESC, quality_score DESC;
 **Utilizare**:
 ```bash
 # Apelat automat de hooks, nu manual
-python3 ~/.claude/memory/scripts/memory_daemon.py session_start
-python3 ~/.claude/memory/scripts/memory_daemon.py user_prompt
-python3 ~/.claude/memory/scripts/memory_daemon.py post_tool
-python3 ~/.claude/memory/scripts/memory_daemon.py session_end
+python3 scripts/memory_daemon.py session_start
+python3 scripts/memory_daemon.py user_prompt
+python3 scripts/memory_daemon.py post_tool
+python3 scripts/memory_daemon.py session_end
 ```
 
 ### 4.2 search_memory.py (Căutare Keyword)
@@ -435,34 +435,34 @@ python3 ~/.claude/memory/scripts/memory_daemon.py session_end
 **Utilizare**:
 ```bash
 # Căutare globală
-python3 ~/.claude/memory/scripts/search_memory.py "docker"
+python3 scripts/search_memory.py "docker"
 
 # Doar în mesaje
-python3 ~/.claude/memory/scripts/search_memory.py --messages "authentication"
+python3 scripts/search_memory.py --messages "authentication"
 
 # Doar în comenzi bash
-python3 ~/.claude/memory/scripts/search_memory.py --commands "git push"
+python3 scripts/search_memory.py --commands "git push"
 
 # Doar erori
-python3 ~/.claude/memory/scripts/search_memory.py --errors "ImportError"
+python3 scripts/search_memory.py --errors "ImportError"
 
 # Doar patterns
-python3 ~/.claude/memory/scripts/search_memory.py --patterns "API"
+python3 scripts/search_memory.py --patterns "API"
 
 # Fișiere modificate
-python3 ~/.claude/memory/scripts/search_memory.py --files "config.py"
+python3 scripts/search_memory.py --files "config.py"
 
 # Doar memorie globală
-python3 ~/.claude/memory/scripts/search_memory.py --global "query"
+python3 scripts/search_memory.py --global "query"
 
 # Doar memorie proiect curent
-python3 ~/.claude/memory/scripts/search_memory.py --project "query"
+python3 scripts/search_memory.py --project "query"
 
 # Limită rezultate
-python3 ~/.claude/memory/scripts/search_memory.py -l 50 "query"
+python3 scripts/search_memory.py -l 50 "query"
 
 # Statistici
-python3 ~/.claude/memory/scripts/search_memory.py --stats
+python3 scripts/search_memory.py --stats
 ```
 
 ### 4.3 reload_memory.py (Reîncărcare Context)
@@ -472,19 +472,19 @@ python3 ~/.claude/memory/scripts/search_memory.py --stats
 **Utilizare**:
 ```bash
 # Standard
-python3 ~/.claude/memory/scripts/reload_memory.py
+python3 scripts/reload_memory.py
 
 # Detalii complete
-python3 ~/.claude/memory/scripts/reload_memory.py --full
+python3 scripts/reload_memory.py --full
 
 # Filtrat pe proiect
-python3 ~/.claude/memory/scripts/reload_memory.py --project /cale/proiect
+python3 scripts/reload_memory.py --project /cale/proiect
 
 # Ultimele N zile
-python3 ~/.claude/memory/scripts/reload_memory.py --days 30
+python3 scripts/reload_memory.py --days 30
 
 # Cu costuri
-python3 ~/.claude/memory/scripts/reload_memory.py --costs
+python3 scripts/reload_memory.py --costs
 ```
 
 **Output exemplu**:
@@ -516,29 +516,29 @@ python3 ~/.claude/memory/scripts/reload_memory.py --costs
 **Utilizare**:
 ```bash
 # Caută soluții pentru o eroare
-python3 ~/.claude/memory/scripts/error_db.py search "ModuleNotFoundError"
-python3 ~/.claude/memory/scripts/error_db.py search "CORS" --language javascript
+python3 scripts/error_db.py search "ModuleNotFoundError"
+python3 scripts/error_db.py search "CORS" --language javascript
 
 # Adaugă eroare cu soluție
-python3 ~/.claude/memory/scripts/error_db.py add \
+python3 scripts/error_db.py add \
     --error "TypeError: X is not a function" \
     --solution "Verifică dacă funcția e exportată corect" \
     --language javascript \
     --framework react
 
 # Cu cod soluție
-python3 ~/.claude/memory/scripts/error_db.py add \
+python3 scripts/error_db.py add \
     --error "ImportError: No module named X" \
     --solution "Instalează modulul" \
     --code "pip install X" \
     --language python
 
 # Listează ultimele erori
-python3 ~/.claude/memory/scripts/error_db.py list
-python3 ~/.claude/memory/scripts/error_db.py list --unsolved
+python3 scripts/error_db.py list
+python3 scripts/error_db.py list --unsolved
 
 # Statistici
-python3 ~/.claude/memory/scripts/error_db.py stats
+python3 scripts/error_db.py stats
 ```
 
 ### 4.5 vector_search.py (Căutare Semantică)
@@ -552,8 +552,8 @@ python3 ~/.claude/memory/scripts/error_db.py stats
 
 **Utilizare**:
 ```bash
-python3 ~/.claude/memory/scripts/vector_search.py "cum configurez autentificarea"
-python3 ~/.claude/memory/scripts/vector_search.py --limit 20 "API REST design"
+python3 scripts/vector_search.py "cum configurez autentificarea"
+python3 scripts/vector_search.py --limit 20 "API REST design"
 ```
 
 ### 4.6 hybrid_search.py (Căutare Combinată)
@@ -567,7 +567,7 @@ final_score = (0.3 × keyword_score) + (0.7 × vector_score) + recency_boost + p
 
 **Utilizare**:
 ```bash
-python3 ~/.claude/memory/scripts/hybrid_search.py "docker compose networking"
+python3 scripts/hybrid_search.py "docker compose networking"
 ```
 
 ### 4.7 say.py (Salvare Răspunsuri)
@@ -634,7 +634,7 @@ Hookurile sunt configurate în `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/memory/scripts/memory_daemon.py pre_tool",
+            "command": "python3 scripts/memory_daemon.py pre_tool",
             "timeout": 5000
           }
         ]
@@ -646,7 +646,7 @@ Hookurile sunt configurate în `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/memory/scripts/memory_daemon.py post_tool",
+            "command": "python3 scripts/memory_daemon.py post_tool",
             "timeout": 10000
           }
         ]
@@ -657,7 +657,7 @@ Hookurile sunt configurate în `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/memory/scripts/memory_daemon.py session_start",
+            "command": "python3 scripts/memory_daemon.py session_start",
             "timeout": 5000
           }
         ]
@@ -668,7 +668,7 @@ Hookurile sunt configurate în `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/memory/scripts/memory_daemon.py session_end",
+            "command": "python3 scripts/memory_daemon.py session_end",
             "timeout": 10000
           }
         ]
@@ -679,7 +679,7 @@ Hookurile sunt configurate în `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.claude/memory/scripts/memory_daemon.py user_prompt",
+            "command": "python3 scripts/memory_daemon.py user_prompt",
             "timeout": 3000
           }
         ]
@@ -758,16 +758,16 @@ final_score = (
 
 ```bash
 # Caut cum am rezolvat o eroare de Docker
-python3 ~/.claude/memory/scripts/search_memory.py --errors "docker"
+python3 scripts/search_memory.py --errors "docker"
 
 # Caut toate comenzile Git folosite
-python3 ~/.claude/memory/scripts/search_memory.py --commands "git"
+python3 scripts/search_memory.py --commands "git"
 
 # Caut semantic: "cum fac deployment"
-python3 ~/.claude/memory/scripts/hybrid_search.py "deployment production"
+python3 scripts/hybrid_search.py "deployment production"
 
 # Caut fișiere modificate recent
-python3 ~/.claude/memory/scripts/search_memory.py --files ".py"
+python3 scripts/search_memory.py --files ".py"
 ```
 
 ---
@@ -794,17 +794,17 @@ Claude primește automat (via SessionStart hook):
 Regulile din CLAUDE.md îl obligă să caute:
 ```bash
 # Dacă utilizatorul zice "am discutat despre X"
-python3 ~/.claude/memory/scripts/search_memory.py "X"
+python3 scripts/search_memory.py "X"
 
 # Dacă întâlnește o eroare
-python3 ~/.claude/memory/scripts/error_db.py search "eroarea"
+python3 scripts/error_db.py search "eroarea"
 ```
 
 ### Când Rezolvă o Eroare
 
 Salvează soluția:
 ```bash
-python3 ~/.claude/memory/scripts/error_db.py add \
+python3 scripts/error_db.py add \
     --error "eroarea întâlnită" \
     --solution "cum am rezolvat" \
     --language python
@@ -826,31 +826,31 @@ say "Am configurat sistemul de autentificare cu JWT..."
 #### Căutare în memorie
 ```bash
 # Ce am discutat despre Docker?
-python3 ~/.claude/memory/scripts/search_memory.py "docker"
+python3 scripts/search_memory.py "docker"
 
 # Ce erori am avut?
-python3 ~/.claude/memory/scripts/search_memory.py --errors
+python3 scripts/search_memory.py --errors
 
 # Ce fișiere am modificat?
-python3 ~/.claude/memory/scripts/search_memory.py --files
+python3 scripts/search_memory.py --files
 
 # Statistici complete
-python3 ~/.claude/memory/scripts/reload_memory.py --full
+python3 scripts/reload_memory.py --full
 ```
 
 #### Gestiune erori
 ```bash
 # Caută soluție pentru o eroare
-python3 ~/.claude/memory/scripts/error_db.py search "mesaj eroare"
+python3 scripts/error_db.py search "mesaj eroare"
 
 # Salvează o soluție nouă
-python3 ~/.claude/memory/scripts/error_db.py add -e "eroare" -s "soluție" -l python
+python3 scripts/error_db.py add -e "eroare" -s "soluție" -l python
 ```
 
 #### Creare memorie per proiect
 ```bash
 cd /cale/către/proiect
-python3 ~/.claude/memory/scripts/init_project_memory.py .
+python3 scripts/init_project_memory.py .
 ```
 
 ### Pentru Dezvoltatori
@@ -858,7 +858,7 @@ python3 ~/.claude/memory/scripts/init_project_memory.py .
 #### Acces direct la DB
 ```bash
 # Deschide baza de date
-sqlite3 ~/.claude/memory/global.db
+sqlite3 ./global.db
 
 # Exemple queries
 SELECT COUNT(*) FROM messages;

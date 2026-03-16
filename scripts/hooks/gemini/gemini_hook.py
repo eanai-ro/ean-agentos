@@ -25,7 +25,7 @@ from pathlib import Path
 # Paths
 SCRIPT_DIR = Path(__file__).parent          # hooks/gemini/
 HOOKS_DIR = SCRIPT_DIR.parent               # hooks/
-PROJECT_ROOT = HOOKS_DIR.parent.parent      # ean-cc-mem-kit/
+PROJECT_ROOT = HOOKS_DIR.parent.parent      # ean-agentos/
 MEMORY_DAEMON = PROJECT_ROOT / "scripts" / "memory_daemon.py"
 
 # Gemini tool names → Claude tool names (pentru compatibilitate cu daemon)

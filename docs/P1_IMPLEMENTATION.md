@@ -6,7 +6,7 @@
 ## Ce s-a implementat
 
 ### 1. CLI Unificat `mem` 
-**Locație:** `~/.claude/memory/scripts/mem`
+**Locație:** `scripts/mem`
 
 Comenzi disponibile:
 - `mem stats` - Statistici generale
@@ -19,7 +19,7 @@ Comenzi disponibile:
 **Teste:** ✅ Toate funcționează
 
 ### 2. Telegram Alert la PreClear
-**Locație:** `~/.claude/memory/scripts/memory_daemon.py`
+**Locație:** `scripts/memory_daemon.py`
 
 Funcționalitate:
 - Alert Telegram când memoria e aproape de auto-compact
@@ -28,7 +28,7 @@ Funcționalitate:
 
 **Config:**
 - `TG_ALERT_DEBOUNCE_SECONDS = 300`
-- State file: `~/.claude/memory/.tg_alert_state.json`
+- State file: `./.tg_alert_state.json`
 
 ### 3. PreCompact Hook
 **Locație:** `~/.claude/settings.json`
@@ -39,7 +39,7 @@ Funcționalitate:
     "hooks": [
       {
         "type": "command",
-        "command": "python3 ~/.claude/memory/scripts/memory_daemon.py pre_compact",
+        "command": "python3 scripts/memory_daemon.py pre_compact",
         "timeout": 5000
       }
     ]

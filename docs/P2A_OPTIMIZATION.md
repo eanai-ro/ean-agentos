@@ -73,4 +73,4 @@
 
 ---
 **Implementat de:** Claude Sonnet 4.5  
-**Script:** `~/.claude/memory/scripts/p2_safe_optimize.sh`
+**Script:** `scripts/p2_safe_optimize.sh`

@@ -1,4 +1,4 @@
-# LICENTE COMPONENTE — Claude Memory Kit
+# LICENTE COMPONENTE — EAN AgentOS
 
 Ultima actualizare: 2026-03-11
 

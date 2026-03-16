@@ -9,10 +9,10 @@
 **Soluție:**
 ```bash
 # Verifică dacă scriptul există
-ls -la ~/.claude/memory/scripts/mem
+ls -la scripts/mem
 
 # Verifică dacă e executabil
-chmod +x ~/.claude/memory/scripts/mem
+chmod +x scripts/mem
 
 # Adaugă în PATH (în ~/.bashrc sau ~/.zshrc)
 export PATH="$HOME/.claude/memory/scripts:$PATH"
@@ -28,14 +28,14 @@ source ~/.bashrc  # sau source ~/.zshrc
 **Soluție:**
 ```bash
 # Verifică procese care folosesc DB-ul
-lsof ~/.claude/memory/global.db
+lsof ./global.db
 
 # Dacă nu e niciun proces legitim, șterge lock-ul
-rm -f ~/.claude/memory/global.db-wal
-rm -f ~/.claude/memory/global.db-shm
+rm -f ./global.db-wal
+rm -f ./global.db-shm
 
 # Verifică integritate după
-sqlite3 ~/.claude/memory/global.db "PRAGMA quick_check;"
+sqlite3 ./global.db "PRAGMA quick_check;"
 ```
 
 ### 3. "mem search" foarte lent (>1s)
@@ -45,19 +45,19 @@ sqlite3 ~/.claude/memory/global.db "PRAGMA quick_check;"
 **Diagnostic:**
 ```bash
 # Verifică dacă FTS5 există
-sqlite3 ~/.claude/memory/global.db "SELECT COUNT(*) FROM messages_fts;"
+sqlite3 ./global.db "SELECT COUNT(*) FROM messages_fts;"
 
 # Verifică query plan
-sqlite3 ~/.claude/memory/global.db "EXPLAIN QUERY PLAN SELECT * FROM messages_fts WHERE messages_fts MATCH 'test';"
+sqlite3 ./global.db "EXPLAIN QUERY PLAN SELECT * FROM messages_fts WHERE messages_fts MATCH 'test';"
 ```
 
 **Soluție:**
 ```bash
 # Re-run optimize
-~/.claude/memory/scripts/p2_safe_optimize.sh
+scripts/p2_safe_optimize.sh
 
 # Dacă e necesar, rebuild FTS5
-~/.claude/memory/scripts/fts_backfill.py
+scripts/fts_backfill.py
 ```
 
 ### 4. "AUTOCOMPACT se declanșează tot timpul"
@@ -109,7 +109,7 @@ echo "TELEGRAM_CHAT_ID=your_chat_id" >> ~/.claude/.env
 **Soluție:**
 ```bash
 # Verifică log-ul reconciler
-tail -100 ~/.claude/memory/daemon_debug.log | grep RECONCILER
+tail -100 ./daemon_debug.log | grep RECONCILER
 
 # Verifică drift detection
 mem reconcile | jq '.drift_detected'
@@ -125,10 +125,10 @@ mem reconcile | jq '.drift_detected'
 **Diagnostic:**
 ```bash
 # Verifică dimensiune
-du -sh ~/.claude/memory/global.db
+du -sh ./global.db
 
 # Verifică ce ocupă spațiu
-sqlite3 ~/.claude/memory/global.db "
+sqlite3 ./global.db "
 SELECT name, COUNT(*) as rows 
 FROM sqlite_master m JOIN (
   SELECT 'messages' as name, COUNT(*) as cnt FROM messages
@@ -142,13 +142,13 @@ GROUP BY name ORDER BY rows DESC;
 **Soluție (opțional - cu backup!):**
 ```bash
 # Backup mai întâi
-cp ~/.claude/memory/global.db ~/backup_$(date +%Y%m%d).db
+cp ./global.db ~/backup_$(date +%Y%m%d).db
 
 # VACUUM (eliberează spațiu)
-sqlite3 ~/.claude/memory/global.db "VACUUM;"
+sqlite3 ./global.db "VACUUM;"
 
 # Verifică integritate
-sqlite3 ~/.claude/memory/global.db "PRAGMA integrity_check;"
+sqlite3 ./global.db "PRAGMA integrity_check;"
 ```
 
 ### 8. "Git repo corupt"
@@ -157,7 +157,7 @@ sqlite3 ~/.claude/memory/global.db "PRAGMA integrity_check;"
 
 **Diagnostic:**
 ```bash
-cd ~/.claude/memory
+cd /path/to/ean-agentos
 git status
 git fsck
 ```
@@ -185,16 +185,16 @@ git commit -m "Re-init after corruption"
 
 ```bash
 # 1. Backup DB
-cp ~/.claude/memory/global.db ~/backups/global_$(date +%Y%m%d).db
+cp ./global.db ~/backups/global_$(date +%Y%m%d).db
 
 # 2. Optimize DB
-~/.claude/memory/scripts/p2_safe_optimize.sh
+scripts/p2_safe_optimize.sh
 
 # 3. Verifică integritate
-sqlite3 ~/.claude/memory/global.db "PRAGMA integrity_check;"
+sqlite3 ./global.db "PRAGMA integrity_check;"
 
 # 4. Git commit dacă ai modificări
-cd ~/.claude/memory
+cd /path/to/ean-agentos
 git add -A
 git commit -m "Monthly update $(date +%Y-%m-%d)"
 ```
@@ -209,7 +209,7 @@ cat ~/.claude/settings.json | jq '.hooks'
 mem stats
 
 # 3. Verifică FTS5
-sqlite3 ~/.claude/memory/global.db "SELECT COUNT(*) FROM messages_fts;"
+sqlite3 ./global.db "SELECT COUNT(*) FROM messages_fts;"
 
 # 4. Test reconciler
 mem reconcile
@@ -221,7 +221,7 @@ mem reconcile
 
 ```bash
 # Enable query timing
-sqlite3 ~/.claude/memory/global.db
+sqlite3 ./global.db
 
 .timer on
 SELECT * FROM messages WHERE content LIKE '%test%' LIMIT 10;
@@ -232,7 +232,7 @@ SELECT * FROM messages WHERE content LIKE '%test%' LIMIT 10;
 
 ```bash
 # Listează indexuri
-sqlite3 ~/.claude/memory/global.db "
+sqlite3 ./global.db "
 SELECT name, tbl_name 
 FROM sqlite_master 
 WHERE type='index' 
@@ -240,7 +240,7 @@ ORDER BY tbl_name, name;
 "
 
 # Verifică dacă indexurile sunt folosite
-sqlite3 ~/.claude/memory/global.db "
+sqlite3 ./global.db "
 EXPLAIN QUERY PLAN 
 SELECT * FROM messages WHERE session_id = 'test';
 "
@@ -250,7 +250,7 @@ SELECT * FROM messages WHERE session_id = 'test';
 
 ```bash
 # Rulează profilare
-~/.claude/memory/scripts/p2a2_profile_mem.sh
+scripts/p2a2_profile_mem.sh
 
 # Analizează rezultatele
 cat /tmp/claude_P2A2_profile_*/run.txt
@@ -266,13 +266,13 @@ cat /tmp/claude_P2A2_profile_*/run.txt
 # 1. NU continua să folosești DB-ul!
 
 # 2. Restaurează din backup
-cp ~/backups/global_YYYYMMDD.db ~/.claude/memory/global.db
+cp ~/backups/global_YYYYMMDD.db ./global.db
 
 # 3. Verifică integritate
-sqlite3 ~/.claude/memory/global.db "PRAGMA integrity_check;"
+sqlite3 ./global.db "PRAGMA integrity_check;"
 
 # 4. Dacă nu ai backup, recovery
-sqlite3 ~/.claude/memory/global.db ".recover" | sqlite3 recovered.db
+sqlite3 ./global.db ".recover" | sqlite3 recovered.db
 ```
 
 ### "Out of memory"
@@ -296,13 +296,13 @@ pkill -f "claude"
 
 ```bash
 # Daemon log
-tail -100 ~/.claude/memory/daemon_debug.log
+tail -100 ./daemon_debug.log
 
 # Compact trace
-tail -100 ~/.claude/memory/compact_trace.log
+tail -100 ./compact_trace.log
 
 # Realtime monitor
-tail -100 ~/.claude/memory/realtime_monitor.log
+tail -100 ./realtime_monitor.log
 ```
 
 ### Informații de Debug
@@ -321,7 +321,7 @@ $(claude --version)
 $(mem stats)
 
 === DB Size ===
-$(du -sh ~/.claude/memory/global.db)
+$(du -sh ./global.db)
 
 === Env Vars ===
 AUTOCOMPACT: $CLAUDE_AUTOCOMPACT_PCT_OVERRIDE

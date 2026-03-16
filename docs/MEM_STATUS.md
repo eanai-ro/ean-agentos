@@ -285,7 +285,7 @@ Pentru monitoring avansat:
 ```bash
 # Restart daemon
 pkill -f memory_daemon
-python3 ~/.claude/memory/scripts/memory_daemon.py &
+python3 scripts/memory_daemon.py &
 
 # Verifică health
 mem doctor

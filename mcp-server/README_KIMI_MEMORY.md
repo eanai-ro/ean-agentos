@@ -33,13 +33,13 @@ Acest pachet adaptează sistemul tău de memorie permanentă (creat pentru Claud
 
 ### Pasul 1: Setup
 ```bash
-cd ~/.claude/memory/mcp-server
+cd ./mcp-server
 bash setup_kimi_memory.sh
 ```
 
 Acest script:
 - Creează `~/.kimi/memory/`
-- Copiază DB din `~/.claude/memory/`
+- Copiază DB din `./`
 - Configurează MCP server
 
 ### Pasul 2: Configurează MCP în Kimi
@@ -63,7 +63,7 @@ args = ["$HOME/.kimi/memory/mcp-server/kimi_memory_server.py"]
 python3 ~/.kimi/memory/mcp-server/kimi_memory_server.py stats
 
 # Sau folosește wrapper
-~/.claude/memory/mcp-server/kimim --stats
+./mcp-server/kimim --stats
 ```
 
 ## 💡 Utilizare
@@ -166,7 +166,7 @@ Când MCP e activ, eu pot folosi:
 ### "DB not found"
 ```bash
 # Copiază manual din Claude
-cp ~/.claude/memory/global.db ~/.kimi/memory/
+cp ./global.db ~/.kimi/memory/
 ```
 
 ### "MCP SDK not available"
@@ -190,7 +190,7 @@ Dacă vrei să folosești **aceeași bază de date** pentru ambele:
 
 ```bash
 # Creează symlink în loc de copie
-ln -s ~/.claude/memory/global.db ~/.kimi/memory/global.db
+ln -s ./global.db ~/.kimi/memory/global.db
 ```
 
 **Atenție:** Dacă rulează ambele simultan, pot apărea conflicte (WAL mode ajută, dar nu e perfect).

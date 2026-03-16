@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Hook wrapper: SessionStart
 # Called by Claude Code at the start of each session.
-# Sets MEMORY_DIR so memory_daemon.py writes to ean-cc-mem-kit's own DB.
+# Sets MEMORY_DIR so memory_daemon.py writes to ean-agentos's own DB.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"

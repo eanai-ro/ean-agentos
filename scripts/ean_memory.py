@@ -246,7 +246,7 @@ def _is_our_hook(hook_entry):
     if isinstance(hook_entry, dict):
         for h in hook_entry.get("hooks", []):
             cmd = h.get("command", "")
-            if "ean-cc-mem-kit" in cmd or "ean-memory" in cmd or str(HOOKS_DIR) in cmd:
+            if "ean-agentos" in cmd or "ean-memory" in cmd or str(HOOKS_DIR) in cmd:
                 return True
     return False
 
@@ -410,7 +410,7 @@ def _is_our_gemini_hook(hook_entry):
     if isinstance(hook_entry, dict):
         for h in hook_entry.get("hooks", []):
             cmd = h.get("command", "")
-            if "ean-cc-mem-kit" in cmd or "gemini_hook.py" in cmd:
+            if "ean-agentos" in cmd or "gemini_hook.py" in cmd:
                 return True
     return False
 

@@ -1,4 +1,4 @@
-# ERRORS_SOLUTIONS — Universal Agent Memory (ean-cc-mem-kit)
+# ERRORS_SOLUTIONS — Universal Agent Memory (ean-agentos)
 
 Jurnal de erori întâlnite și soluțiile lor.
 
@@ -7,9 +7,9 @@ Jurnal de erori întâlnite și soluțiile lor.
 ## E001 — Web server folosea DB greșită
 
 - **Data:** 2026-03-15
-- **Descriere:** Web server-ul (`web_server.py`) avea default `~/.claude/memory/global.db` (955MB legacy) în loc de project-local DB
+- **Descriere:** Web server-ul (`web_server.py`) avea default `./global.db` (955MB legacy) în loc de project-local DB
 - **Cauza:** Hardcoded default la linia 40: `MEMORY_DIR = Path.home() / ".claude" / "memory"`
-- **Soluție:** Restart server cu env var: `MEMORY_DB_PATH=/mnt/lucru/proiecte/claude/ean-cc-mem-kit/global.db`
+- **Soluție:** Restart server cu env var: `MEMORY_DB_PATH=/mnt/lucru/proiecte/claude/ean-agentos/global.db`
 - **Risc:** Recidivă la fiecare restart fără env var
 - **Status:** 🟡 Workaround (trebuie systemd service sau fix permanent)
 - **Rezolvat de:** Claude Code (AI)
@@ -47,9 +47,9 @@ Jurnal de erori întâlnite și soluțiile lor.
 - **Cauza:** Componente diferite cu default-uri diferite pentru MEMORY_DIR
 - **Log:**
   ```
-  ~/.claude/memory/global.db       # 955MB - legacy (vechi)
+  ./global.db       # 955MB - legacy (vechi)
   ~/.ean-memory/global.db          # 22MB  - intermediar
-  ean-cc-mem-kit/global.db         # 896KB - project-local
+  ean-agentos/global.db         # 896KB - project-local
   ```
 - **Soluție:** Unificat toate componentele să folosească project-local DB prin schimbarea default-urilor în: memory_daemon.py, toate hooks, codex_rollout_watcher.py, gemini_hook.py, MCP configs
 - **Status:** ✅ Rezolvat
