@@ -1,0 +1,1602 @@
+#!/usr/bin/env python3
+"""
+mem - CLI unificat pentru memoria permanentă Claude Code
+Utilizare: mem <command> [args]
+"""
+
+import sys
+import os
+import json
+import sqlite3
+import subprocess
+from pathlib import Path
+from datetime import datetime
+
+# Paths — rezolvare relativă la locația scriptului (portabil)
+V2_SCRIPTS_DIR = Path(__file__).parent
+SCRIPTS_DIR = V2_SCRIPTS_DIR  # Unified: toate scripturile sunt în același director
+
+# DB path via v2_common resolver
+try:
+    sys.path.insert(0, str(V2_SCRIPTS_DIR))
+    from v2_common import resolve_db_path
+    DB_PATH = resolve_db_path()
+except ImportError:
+    DB_PATH = Path.home() / ".claude" / "memory" / "global.db"
+
+# Log paths
+PROJECT_ROOT = V2_SCRIPTS_DIR.parent
+TRACE_LOG = PROJECT_ROOT / "compact_trace.log"
+WARNINGS_LOG = PROJECT_ROOT / "daemon_warnings.log"
+MEMORY_DIR = PROJECT_ROOT  # Compatibilitate
+
+def get_db():
+    """Conectare la baza de date."""
+    if not DB_PATH.exists():
+        print(f"❌ Baza de date nu există: {DB_PATH}")
+        sys.exit(1)
+    return sqlite3.connect(DB_PATH)
+
+def cmd_help():
+    """Afișează help."""
+    print("""
+mem - CLI pentru memoria permanentă Claude Code
+================================================
+
+Comenzi disponibile:
+
+  mem backup                    Status backup (default)
+  mem backup create             Creează backup manual
+  mem backup list               Listează toate backup-urile
+  mem backup verify [<file>]    Verifică integritate backup(uri)
+  mem backup restore <file>     Restaurează din backup (necesită --force)
+  mem backup cleanup            Aplică retenție (șterge vechi)
+  mem backup status             Status complet backup system
+
+  mem doctor                   Health check rapid (6 verificări)
+  mem doctor --fix             Health check + remedieri automate
+  mem doctor --json            Output JSON
+
+  mem quarantine list          Listează entries blocate
+  mem quarantine show <id>     Detalii entry specific
+  mem quarantine stats         Statistici quarantine
+  mem quarantine purge --all   Șterge toate entries
+
+  mem panic panic              🚨 Incident response: freeze + backup + scan + report
+  mem panic panic --scan-only  Doar scan, fără freeze
+  mem panic panic --fix        Apply fixes (requires MEMORY_PANIC_ALLOW_FIX=1)
+  mem panic panic --dry-run    Dry run pentru --fix
+  mem panic status             Status panic mode
+  mem panic resume             Repornire din panic mode
+
+  mem status                   📊 Dashboard observability (one-screen view)
+  mem status --json            Output JSON pentru automation
+
+  mem audit tail [N]           Ultimele N audit events (default 20)
+  mem audit search <query>     Caută în audit log
+  mem audit stats              Statistici audit (by action, severity, table, actor)
+  mem audit stats --json       JSON output
+
+  mem fp stats                 Overview detecții (total, by category, confidence)
+  mem fp top [N]               Top N categories by detection count
+  mem fp rules                 Lista reguli active
+  mem fp rules --pattern <id>  Detalii pentru o regulă
+  mem fp recent [N]            Ultimele N detecții
+  mem fp search <query>        Caută în detection_events
+
+  mem search <query>           Caută în mesaje, comenzi, erori
+  mem search <query> --messages   Doar în mesaje
+  mem search <query> --commands   Doar în comenzi Bash
+
+  mem err                      Ultimele 10 erori
+  mem err last <N>             Ultimele N erori
+  mem err resolve <id> -s "..."   Marchează eroare ca rezolvată
+  mem err unresolved           Erori nerezolvate
+
+  mem stats                    Statistici generale
+  mem trace [N]                Ultimele N linii din trace logs (default 20)
+  mem reconcile [--force]      Rulează transcript reconciler
+  mem reload [--full]          Reload memorie (după compact)
+
+  --- 18C: Review Auto-Extracted ---
+
+  mem review                     Items auto-extracted pending review
+  mem review pending             Listează items de revizuit
+  mem review approve <type> <id> Aprobă item (decision/fact/resolution)
+  mem review reject <type> <id>  Rejectează item
+  mem review stats               Statistici pending/approved/rejected
+
+  --- 18D: Orchestration ---
+
+  mem orch create "title"         Creează proiect orchestrat (CLI curent = orchestrator)
+  mem orch status [project_id]    Status proiect(e)
+  mem orch add-task <proj> "t" "d" Adaugă task la proiect
+  mem orch tasks [--mine|--available] Listează task-uri
+  mem orch claim <task_id>        Claim task (cu lease de 30 min)
+  mem orch done <task_id> [summ]  Marchează task ca done
+  mem orch deliberate "topic"     Pornește deliberare (--type quick|deep|expert)
+  mem orch propose <sid> "text"   Propunere în runda curentă
+  mem orch vote <sid> <option>    Votează
+  mem orch send <to|all> "mesaj"  Trimite mesaj inter-agent
+  mem orch messages [--unread]    Citește mesaje
+  mem orch agents                 Cine e online
+  mem orch daemon [--once]        Pornește housekeeping daemon
+
+  --- V2: Decisions, Facts ---
+
+  mem decide -t "..." -d "..."   Înregistrează decizie nouă
+  mem decisions                  Listează decizii active
+  mem decisions --all            Toate (inclusiv superseded/archived)
+  mem decisions --stale          Doar decizii expirate
+  mem decisions show <id>        Detalii decizie
+  mem decisions supersede <id>   Înlocuiește decizie
+  mem decisions archive <id>     Arhivează decizie
+
+  mem learn "fact" -t type       Înregistrează cunoștință nouă
+  mem learn list                 Listează facts active
+  mem learn list --pinned        Doar pinned
+  mem learn search "query"       Caută în facts
+  mem learn show <id>            Detalii fact
+  mem learn deactivate <id>      Dezactivează fact
+  mem learn supersede <id> "x"   Înlocuiește fact
+  mem pin <id>                   Pin fact în context
+  mem unpin <id>                 Unpin fact
+
+  --- V2: Goals, Tasks, Projects ---
+
+  mem goal -t "..." -p high      Creează obiectiv nou
+  mem goal list                  Listează goals active
+  mem goal show <id>             Detalii goal + task-uri
+  mem goal complete <id>         Marchează completat
+  mem goal pause <id>            Pune pe pauză
+  mem goal abandon <id>          Abandonează
+
+  mem task -t "..." --goal 1     Creează task (opțional legat de goal)
+  mem task list                  Listează tasks active
+  mem task start <id>            todo → in_progress
+  mem task done <id>             → done
+  mem task block <id>            → blocked
+  mem task cancel <id>           → cancelled
+
+  mem project                    Profil proiect curent
+  mem project init               Creează profil proiect
+  mem project list               Toate proiectele
+  mem project note "text"        Adaugă notă
+  mem project set-stack '[...]'  Setează tech stack
+
+  --- V2C: Error Intelligence + Model Attribution ---
+
+  mem resolve <err_id> -s "..."   Înregistrează rezolvare eroare
+  mem resolve list                Listează rezolvări
+  mem resolve show <id>           Detalii rezolvare
+  mem resolve search "query"      Caută rezolvări
+
+  mem model set <id> <provider>   Setează modelul curent
+  mem model                       Afișează modelul curent
+  mem model clear                 Șterge modelul curent
+
+  --- V2: Context Builder + Intent ---
+
+  mem intent                       Afișează intenția sesiunii curente
+  mem intent set <intent>          Setează intent (debugging/feature/deploy/docs/refactor/review/explore)
+  mem intent clear                 Șterge intent
+
+  mem context                      Context auto (strategy engine alege modul optim)
+  mem context --compact            Forțează compact (~400-800 tok)
+  mem context --full               Forțează full (fără budget)
+  mem context --survival           Forțează ultra-scurt (~200-300 tok)
+  mem context --delta              Forțează delta (doar schimbări)
+  mem context --json               Output JSON
+  mem context --budget 1000        Budget personalizat
+  mem context --intent debugging   Override intent pentru scoring
+
+  mem strategy                     Afișează strategia de context recomandată
+  mem strategy --trigger session_start   Simulează trigger session_start
+  mem strategy --json              Output JSON
+
+  --- V4: Intelligence Layer ---
+
+  mem patterns                     Listează error patterns detectate
+  mem patterns detect              Scanează și detectează patternuri noi
+  mem patterns show <id>           Detalii pattern
+
+  mem intelligence                 Raport complet (patterns + conflicts + cleanup + promote)
+
+  mem cleanup                      Raport stale (facts, tasks, resolutions, goals)
+  mem cleanup mark                 Marchează stale (dezactivează/cancel)
+
+  mem promote                      Promovează automat facts importante (pin)
+  mem promote scan                 Scanează și afișează scoruri
+  mem promote list                 Listează candidați promovare
+
+  --- V5A: Checkpoints + Timeline ---
+
+  mem checkpoint create "<name>"   Creează checkpoint (snapshot logic)
+  mem checkpoint create "x" --full Salvează toate entitățile
+  mem checkpoint create "x" --compact  Doar pinned facts
+  mem checkpoint create "x" -d "..." Cu descriere
+  mem checkpoint list              Listează checkpoints
+  mem checkpoint show <id>         Detalii checkpoint
+  mem checkpoint restore <id>      Restaurare (safe mode, cere --force)
+  mem checkpoint restore <id> --force  Confirmă restore
+
+  mem timeline                     Vizualizare cronologică evenimente
+  mem timeline --days 7            Ultimele 7 zile
+  mem timeline --all               Toate evenimentele
+  mem timeline --type decision     Doar un tip
+
+  mem events                       🔄 Agent event stream
+  mem events --agent <name>        Filtrare pe agent
+  mem events --model <model>       Filtrare pe model
+  mem events --type <event_type>   Filtrare pe tip eveniment
+  mem events --branch <name>       Filtrare pe branch
+  mem events --failed              Doar evenimente eșuate
+  mem events --limit 20            Limită rezultate
+  mem events --json                Output JSON
+
+  mem dashboard                    📊 Dashboard complet proiect curent
+  mem dashboard --json             Output JSON
+  mem dashboard --project <path>   Dashboard alt proiect
+
+  --- V15C: Reasoning Traces, Experience Replay, Cross-Agent Learning ---
+
+  mem trace session <id>           🔍 Reasoning trace per sesiune
+  mem trace agent <name>           Reasoning trace per agent
+  mem trace entity <table> <id>    Reasoning trace per entitate
+
+  mem replay session <id>          🔄 Experience replay per sesiune
+  mem replay agent <name>          Experience replay per agent
+  mem replay branch <name>         Experience replay per branch (rich)
+
+  mem learnings scan               🌟 Scanează candidați promovare
+  mem learnings promote <tbl> <id> Promovează item la global
+  mem learnings promote-auto       Auto-promote ≥5 puncte
+  mem learnings suggest <agent>    Sugestii cross-agent
+  mem learnings list               Items promovate global
+  mem learnings stats              Statistici cross-agent learning
+
+  --- V15D: Memory Intelligence Layer ---
+
+  mem score score <tbl> <id>       📊 Score confidence entitate
+  mem score score-all              Score toate entitățile active
+  mem score recalc-agents          Recalculează reputații agenți
+  mem score show-agents            Afișează reputații agenți
+
+  mem graph build                  🔗 Construiește experience graph
+  mem graph show <tbl> <id>        Vecini entitate în graph
+  mem graph path <t1> <id1> <t2> <id2>  Cale între entități
+  mem graph stats                  Statistici graph
+
+  mem suggest "error message"      💡 Caută soluții (ordonate scor)
+  mem suggest "msg" --limit N      Limită rezultate
+  mem suggest "msg" --json         Output JSON
+
+  mem help                     Această pagină
+
+Exemple:
+  mem backup                   # 14 zile retenție
+  mem backup --keep 30         # 30 zile retenție
+  mem search "autentificare"
+  mem decide -t "SQLite nu PostgreSQL" -d "Simplitate și portabilitate"
+  mem learn "Python 3.10 nu creează event loop implicit" -t gotcha -c python
+  mem pin 1
+  mem err last 5
+  mem err resolve 158 -s "Am adăugat try/except"
+  mem stats
+  mem trace 50
+""")
+
+def cmd_search(args):
+    """Caută în memorie — unified cognitive search."""
+    if not args:
+        print("❌ Folosire: mem search <query> [--scope all|raw|structured|errors] [-l LIMIT]")
+        print("   Aliases: --messages, --commands, --errors (backward compat)")
+        return
+
+    query = args[0]
+    flags = args[1:] if len(args) > 1 else []
+
+    # New unified search via cognitive_search.py
+    cognitive_script = V2_SCRIPTS_DIR / "cognitive_search.py"
+    if cognitive_script.exists():
+        cmd = ["python3", str(cognitive_script), query]
+        if "--scope" in flags:
+            idx = flags.index("--scope")
+            if idx + 1 < len(flags):
+                cmd.extend(["--scope", flags[idx + 1]])
+        elif "--raw" in flags or "--messages" in flags or "--commands" in flags:
+            cmd.extend(["--scope", "raw"])
+        elif "--structured" in flags:
+            cmd.extend(["--scope", "structured"])
+        elif "--errors" in flags:
+            cmd.extend(["--scope", "errors"])
+        if "-l" in flags:
+            idx = flags.index("-l")
+            if idx + 1 < len(flags):
+                cmd.extend(["-l", flags[idx + 1]])
+        subprocess.run(cmd)
+    else:
+        # Fallback to old search
+        script = SCRIPTS_DIR / "search_memory.py"
+        if not script.exists():
+            print(f"❌ Script lipsă: {script}")
+            return
+        cmd = ["python3", str(script), query]
+        if "--messages" in flags:
+            cmd.append("--messages")
+        elif "--commands" in flags:
+            cmd.append("--commands")
+        elif "--errors" in flags:
+            cmd.append("--errors")
+        subprocess.run(cmd)
+
+
+def cmd_errorlearn(args):
+    """Error Learning — find similar errors, top patterns, stats."""
+    script = V2_SCRIPTS_DIR / "error_learning.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    if not args:
+        subprocess.run(["python3", str(script), "--help"])
+        return
+
+    subprocess.run(["python3", str(script)] + args)
+
+
+def cmd_replay(args):
+    """Experience Replay — replay cronologic bogat."""
+    script = V2_SCRIPTS_DIR / "experience_replay.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args and args[0] in ("session", "agent", "branch"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script)] + (args or ["--help"])
+    subprocess.run(cmd)
+
+
+def cmd_learnings(args):
+    """Cross-Agent Learning — promovare experiențe reutilizabile."""
+    script = V2_SCRIPTS_DIR / "cross_agent_learning.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args and args[0] in ("scan", "promote", "promote-auto", "suggest", "list", "stats"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script)] + (args or ["--help"])
+    subprocess.run(cmd)
+
+
+def cmd_score(args):
+    """Memory Scoring — calcul confidence transparent."""
+    script = V2_SCRIPTS_DIR / "memory_scoring.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args and args[0] in ("score", "score-all", "recalc-agents", "show-agents"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script)] + (args or ["--help"])
+    subprocess.run(cmd)
+
+
+def cmd_graph(args):
+    """Experience Graph — problem → resolution links."""
+    script = V2_SCRIPTS_DIR / "experience_graph.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args and args[0] in ("build", "show", "path", "stats"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script)] + (args or ["--help"])
+    subprocess.run(cmd)
+
+
+def cmd_suggest(args):
+    """Solution Index — problem → solution lookup."""
+    script = V2_SCRIPTS_DIR / "solution_index.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args:
+        cmd = ["python3", str(script), "suggest"] + args
+    else:
+        print("❌ Folosire: mem suggest \"error message\" [--limit N] [--json]")
+    subprocess.run(cmd)
+
+def cmd_err(args):
+    """Gestionare erori."""
+    conn = get_db()
+    cursor = conn.cursor()
+
+    if not args or args[0] == "last":
+        # Ultimele N erori
+        limit = 10
+        if len(args) >= 2:
+            try:
+                limit = int(args[1])
+            except ValueError:
+                limit = 10
+
+        cursor.execute("""
+            SELECT id, created_at, tool_name_resolved,
+                   substr(error_message, 1, 80) as err_short,
+                   resolved, source
+            FROM errors_solutions
+            ORDER BY id DESC
+            LIMIT ?
+        """, (limit,))
+
+        rows = cursor.fetchall()
+        if not rows:
+            print("✅ Nicio eroare înregistrată.")
+            return
+
+        print(f"\n{'ID':>5} {'Data':>12} {'Tool':>20} {'Resolved':>8} {'Eroare':<50}")
+        print("-" * 100)
+        for row in rows:
+            id_, created, tool, err, resolved, source = row
+            date_short = created[:10] if created else "?"
+            tool_short = (tool or "?")[:20]
+            resolved_str = "✅" if resolved else "❌"
+            err_short = (err or "")[:50].replace("\n", " ")
+            print(f"{id_:>5} {date_short:>12} {tool_short:>20} {resolved_str:>8} {err_short:<50}")
+
+        print(f"\nTotal: {len(rows)} erori afișate")
+
+    elif args[0] == "resolve":
+        if len(args) < 2:
+            print("❌ Folosire: mem err resolve <id> -s \"soluție\"")
+            return
+
+        try:
+            err_id = int(args[1])
+        except ValueError:
+            print("❌ ID invalid")
+            return
+
+        solution = ""
+        if "-s" in args:
+            idx = args.index("-s")
+            if idx + 1 < len(args):
+                solution = args[idx + 1]
+
+        # Verifică dacă există coloana solution
+        cursor.execute("PRAGMA table_info(errors_solutions)")
+        columns = [row[1] for row in cursor.fetchall()]
+
+        if "solution" in columns:
+            cursor.execute("""
+                UPDATE errors_solutions
+                SET resolved = 1, solution = ?
+                WHERE id = ?
+            """, (solution, err_id))
+        else:
+            cursor.execute("""
+                UPDATE errors_solutions
+                SET resolved = 1
+                WHERE id = ?
+            """, (err_id,))
+
+        conn.commit()
+        if cursor.rowcount > 0:
+            print(f"✅ Eroare #{err_id} marcată ca rezolvată")
+            if solution:
+                print(f"   Soluție: {solution}")
+        else:
+            print(f"❌ Eroare #{err_id} nu a fost găsită")
+
+    elif args[0] == "unresolved":
+        cursor.execute("""
+            SELECT id, created_at, tool_name_resolved,
+                   substr(error_message, 1, 60) as err_short
+            FROM errors_solutions
+            WHERE resolved = 0 OR resolved IS NULL
+            ORDER BY id DESC
+            LIMIT 20
+        """)
+
+        rows = cursor.fetchall()
+        if not rows:
+            print("✅ Toate erorile sunt rezolvate!")
+            return
+
+        print(f"\n{'ID':>5} {'Data':>12} {'Tool':>20} {'Eroare':<60}")
+        print("-" * 100)
+        for row in rows:
+            id_, created, tool, err = row
+            date_short = created[:10] if created else "?"
+            tool_short = (tool or "?")[:20]
+            err_short = (err or "")[:60].replace("\n", " ")
+            print(f"{id_:>5} {date_short:>12} {tool_short:>20} {err_short:<60}")
+
+        print(f"\n❌ {len(rows)} erori nerezolvate")
+
+    conn.close()
+
+def cmd_stats():
+    """Statistici generale."""
+    conn = get_db()
+    cursor = conn.cursor()
+
+    print("\n📊 STATISTICI MEMORIE PERMANENTĂ")
+    print("=" * 50)
+
+    # Mesaje
+    cursor.execute("SELECT COUNT(*) FROM messages")
+    msg_count = cursor.fetchone()[0]
+    print(f"💬 Mesaje totale:        {msg_count:,}")
+
+    # Sesiuni
+    cursor.execute("SELECT COUNT(*) FROM sessions")
+    sess_count = cursor.fetchone()[0]
+    print(f"📁 Sesiuni totale:       {sess_count:,}")
+
+    # Tool calls
+    cursor.execute("SELECT COUNT(*) FROM tool_calls")
+    tool_count = cursor.fetchone()[0]
+    print(f"🔧 Tool calls:           {tool_count:,}")
+
+    # Bash history
+    cursor.execute("SELECT COUNT(*) FROM bash_history")
+    bash_count = cursor.fetchone()[0]
+    print(f"💻 Comenzi Bash:         {bash_count:,}")
+
+    # Erori
+    cursor.execute("SELECT COUNT(*) FROM errors_solutions")
+    err_total = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM errors_solutions WHERE resolved = 1")
+    err_resolved = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM errors_solutions WHERE source = 'auto_reconciler'")
+    err_reconciler = cursor.fetchone()[0]
+    print(f"❌ Erori totale:         {err_total:,}")
+    print(f"✅ Erori rezolvate:      {err_resolved:,}")
+    print(f"🔄 Din reconciler:       {err_reconciler:,}")
+
+    # Checkpoints
+    try:
+        cursor.execute("SELECT COUNT(*), MAX(id) FROM checkpoints")
+        cp_count, cp_last = cursor.fetchone()
+        print(f"💾 Checkpoints:          {cp_count or 0:,} (ultim: #{cp_last or 0})")
+    except:
+        print(f"💾 Checkpoints:          N/A")
+
+    # DB size
+    db_size = DB_PATH.stat().st_size / (1024 * 1024)
+    print(f"\n📦 Dimensiune DB:        {db_size:.1f} MB")
+
+    # AUTOCOMPACT status
+    autocompact = os.environ.get("CLAUDE_AUTOCOMPACT_PCT_OVERRIDE", "nesetat")
+    print(f"⚙️  AUTOCOMPACT_OVERRIDE: {autocompact}")
+
+    conn.close()
+
+def cmd_trace(args):
+    """Afișează trace logs sau reasoning traces."""
+    # V15C: delegate to reasoning_trace.py for session/agent/entity subcommands
+    if args and args[0] in ("session", "agent", "entity"):
+        script = V2_SCRIPTS_DIR / "reasoning_trace.py"
+        if script.exists():
+            subprocess.run(["python3", str(script)] + args)
+            return
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    # Fallback: old trace log viewer
+    limit = 20
+    if args:
+        try:
+            limit = int(args[0])
+        except ValueError:
+            limit = 20
+
+    print("\n📋 COMPACT TRACE LOG")
+    print("-" * 50)
+    if TRACE_LOG.exists():
+        lines = TRACE_LOG.read_text().strip().split("\n")
+        for line in lines[-limit:]:
+            print(line)
+    else:
+        print("(gol)")
+
+    print("\n⚠️  DAEMON WARNINGS LOG")
+    print("-" * 50)
+    if WARNINGS_LOG.exists():
+        lines = WARNINGS_LOG.read_text().strip().split("\n")
+        for line in lines[-limit:]:
+            print(line)
+    else:
+        print("(gol)")
+
+def cmd_reconcile(args):
+    """Rulează transcript reconciler."""
+    script = SCRIPTS_DIR / "transcript_reconciler.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    cmd = ["python3", str(script), "reconcile"]
+    if "--force" in args:
+        cmd.append("--force")
+
+    subprocess.run(cmd)
+
+def cmd_reload(args):
+    """Reload memorie după compact."""
+    script = SCRIPTS_DIR / "reload_memory.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    cmd = ["python3", str(script)]
+    if "--full" in args:
+        cmd.append("--full")
+
+    subprocess.run(cmd)
+
+def cmd_backup(args):
+    """Backup & Recovery V1 — create, list, verify, restore, cleanup, status."""
+    script = V2_SCRIPTS_DIR / "backup_manager.py"
+    if not script.exists():
+        print(f"❌ Script backup lipsă: {script}")
+        return
+
+    if args and args[0] in ("create", "list", "verify", "restore", "cleanup", "status"):
+        cmd = ["python3", str(script)] + args
+    elif not args:
+        # Default: status
+        cmd = ["python3", str(script), "status"]
+    else:
+        cmd = ["python3", str(script)] + args
+
+    subprocess.run(cmd)
+
+def cmd_doctor(args):
+    """Verificare sănătate bază de date."""
+    script = SCRIPTS_DIR / "mem_doctor.py"
+    if not script.exists():
+        print(f"❌ Script doctor lipsă: {script}")
+        return
+
+    cmd = ["python3", str(script)]
+    if "--fix" in args:
+        cmd.append("--fix")
+    if "--json" in args:
+        cmd.append("--json")
+
+    result = subprocess.run(cmd)
+    sys.exit(result.returncode)
+
+def cmd_quarantine(args):
+    """Management quarantine entries."""
+    script = SCRIPTS_DIR / "mem_quarantine.py"
+    if not script.exists():
+        print(f"❌ Script quarantine lipsă: {script}")
+        return
+
+    # Pasează toate args către mem_quarantine.py
+    cmd = ["python3", str(script)] + args
+    result = subprocess.run(cmd)
+    sys.exit(result.returncode)
+
+def cmd_panic(args):
+    """Incident response și secrets hunt."""
+    script = SCRIPTS_DIR / "mem_panic.py"
+    if not script.exists():
+        print(f"❌ Script panic lipsă: {script}")
+        return
+
+    # Pasează toate args către mem_panic.py
+    cmd = ["python3", str(script)] + args
+    result = subprocess.run(cmd)
+    sys.exit(result.returncode)
+
+def cmd_status(args):
+    """Dashboard observability - status general memorie."""
+    script = SCRIPTS_DIR / "mem_status.py"
+    if not script.exists():
+        print(f"❌ Script status lipsă: {script}")
+        return
+
+    cmd = ["python3", str(script)]
+    if "--json" in args:
+        cmd.append("--json")
+
+    result = subprocess.run(cmd)
+    sys.exit(result.returncode)
+
+def cmd_audit(args):
+    """Audit trail - trasabilitate modificări."""
+    script = SCRIPTS_DIR / "mem_audit.py"
+    if not script.exists():
+        print(f"❌ Script audit lipsă: {script}")
+        return
+
+    # Pasează toate args către mem_audit.py
+    cmd = ["python3", str(script)] + args
+    result = subprocess.run(cmd)
+    sys.exit(result.returncode)
+
+def cmd_fp(args):
+    """False positive scoring - reducere FP."""
+    script = SCRIPTS_DIR / "mem_fp.py"
+    if not script.exists():
+        print(f"❌ Script fp lipsă: {script}")
+        return
+
+    # Pasează toate args către mem_fp.py
+    cmd = ["python3", str(script)] + args
+    result = subprocess.run(cmd)
+    sys.exit(result.returncode)
+
+
+def cmd_decide(args):
+    """Înregistrare decizie nouă."""
+    script = V2_SCRIPTS_DIR / "decision_tracker.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    cmd = ["python3", str(script), "add"] + args
+    subprocess.run(cmd)
+
+
+def cmd_decisions(args):
+    """Listare/gestionare decizii."""
+    script = V2_SCRIPTS_DIR / "decision_tracker.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    # Detectează subcomenzile: show, supersede, archive
+    if args and args[0] in ("show", "supersede", "archive"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script), "list"] + args
+
+    subprocess.run(cmd)
+
+
+def cmd_learn(args):
+    """Gestionare cunoștințe (learned facts)."""
+    script = V2_SCRIPTS_DIR / "learned_facts.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    # Detectează subcomenzile: list, search, show, deactivate, supersede, pin, unpin
+    if args and args[0] in ("list", "search", "show", "deactivate", "supersede", "pin", "unpin"):
+        cmd = ["python3", str(script)] + args
+    else:
+        # Default: add (primul argument e textul fact-ului)
+        cmd = ["python3", str(script), "add"] + args
+
+    subprocess.run(cmd)
+
+
+def cmd_pin(args):
+    """Pin un fact în context."""
+    script = V2_SCRIPTS_DIR / "learned_facts.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    cmd = ["python3", str(script), "pin"] + args
+    subprocess.run(cmd)
+
+
+def cmd_unpin(args):
+    """Unpin un fact."""
+    script = V2_SCRIPTS_DIR / "learned_facts.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    cmd = ["python3", str(script), "unpin"] + args
+    subprocess.run(cmd)
+
+
+def cmd_goal(args):
+    """Gestionare goals."""
+    script = V2_SCRIPTS_DIR / "goal_tracker.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    # Detectează subcomenzile: list, show, complete, pause, abandon
+    if args and args[0] in ("list", "show", "complete", "pause", "abandon"):
+        cmd = ["python3", str(script), "goal"] + args
+    else:
+        # Default: add
+        cmd = ["python3", str(script), "goal", "add"] + args
+
+    subprocess.run(cmd)
+
+
+def cmd_task(args):
+    """Gestionare tasks."""
+    script = V2_SCRIPTS_DIR / "goal_tracker.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    # Detectează subcomenzile: list, start, done, block, cancel
+    if args and args[0] in ("list", "start", "done", "block", "cancel"):
+        cmd = ["python3", str(script), "task"] + args
+    else:
+        # Default: add
+        cmd = ["python3", str(script), "task", "add"] + args
+
+    subprocess.run(cmd)
+
+
+def cmd_project(args):
+    """Gestionare profiluri proiecte."""
+    script = V2_SCRIPTS_DIR / "project_profile.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    if args and args[0] in ("init", "show", "list", "note", "set-stack", "set-conventions"):
+        cmd = ["python3", str(script)] + args
+    else:
+        # Default: show profil curent
+        cmd = ["python3", str(script), "show"] + args
+
+    subprocess.run(cmd)
+
+
+def cmd_intent(args):
+    """Gestionare session intent."""
+    sys.path.insert(0, str(V2_SCRIPTS_DIR))
+    from v2_common import (
+        get_current_intent, set_current_intent, clear_current_intent,
+        invalidate_snapshot, VALID_INTENTS,
+    )
+
+    if not args or args[0] == "show":
+        intent = get_current_intent()
+        if intent:
+            print(f"Intent curent: {intent}")
+        else:
+            print("Niciun intent setat.")
+            print(f"  Valide: {', '.join(VALID_INTENTS)}")
+    elif args[0] == "set":
+        if len(args) < 2:
+            print(f"❌ Folosire: mem intent set <intent>")
+            print(f"   Valide: {', '.join(VALID_INTENTS)}")
+            return
+        intent = args[1].lower()
+        if intent not in VALID_INTENTS:
+            print(f"❌ Intent invalid: {intent}")
+            print(f"   Valide: {', '.join(VALID_INTENTS)}")
+            return
+        set_current_intent(intent)
+        invalidate_snapshot()
+        print(f"✅ Intent setat: {intent}")
+    elif args[0] == "clear":
+        clear_current_intent()
+        invalidate_snapshot()
+        print("✅ Intent șters.")
+    else:
+        print(f"❌ Subcomandă necunoscută: {args[0]}")
+        print("   Valide: set, show, clear")
+
+
+def cmd_context(args):
+    """Context Builder V2. Fără flags → auto strategy."""
+    # Dacă nu are flag-uri de mod explicit, folosește auto strategy
+    mode_flags = {"--compact", "--full", "--survival", "--delta"}
+    has_mode = any(f in args for f in mode_flags)
+
+    if not has_mode and "--json" not in args:
+        # Auto strategy mode
+        script = V2_SCRIPTS_DIR / "context_strategy.py"
+        if script.exists():
+            sys.path.insert(0, str(V2_SCRIPTS_DIR))
+            try:
+                from context_strategy import choose_context_mode
+                strategy = choose_context_mode(trigger="manual")
+                mode = strategy["mode"]
+                auto_args = list(args)
+                if mode == "delta":
+                    auto_args.append("--delta")
+                else:
+                    auto_args.append(f"--{mode}")
+                if strategy.get("budget") and strategy["budget"] < 99999:
+                    auto_args.extend(["--budget", str(strategy["budget"])])
+
+                script_ctx = V2_SCRIPTS_DIR / "context_builder_v2.py"
+                cmd = ["python3", str(script_ctx)] + auto_args
+                subprocess.run(cmd)
+                return
+            except Exception:
+                pass  # Fallback to default
+
+    script = V2_SCRIPTS_DIR / "context_builder_v2.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    cmd = ["python3", str(script)] + args
+    subprocess.run(cmd)
+
+
+def cmd_strategy(args):
+    """Afișează strategia de context curentă."""
+    script = V2_SCRIPTS_DIR / "context_strategy.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    cmd = ["python3", str(script)] + args
+    subprocess.run(cmd)
+
+
+def cmd_patterns(args):
+    """Error pattern detection."""
+    script = V2_SCRIPTS_DIR / "error_patterns.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args and args[0] in ("detect", "list", "show"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script), "list"] + args
+    subprocess.run(cmd)
+
+
+def cmd_intelligence(args):
+    """Raport complet intelligence layer."""
+    # Rulează toate analizele
+    print("\n🧠 MEMORY INTELLIGENCE REPORT\n")
+    for name, script_name, default_cmd in [
+        ("Error Patterns", "error_patterns.py", "list"),
+        ("Decision Conflicts", "decision_analyzer.py", "conflicts"),
+        ("Memory Cleanup", "memory_cleanup.py", "report"),
+    ]:
+        script = V2_SCRIPTS_DIR / script_name
+        if script.exists():
+            print(f"--- {name} ---")
+            subprocess.run(["python3", str(script), default_cmd])
+            print()
+        else:
+            print(f"  ⚠ {name}: script lipsă")
+
+    # Fact promoter scan
+    script = V2_SCRIPTS_DIR / "fact_promoter.py"
+    if script.exists():
+        print("--- Fact Promoter ---")
+        subprocess.run(["python3", str(script), "scan"])
+
+
+def cmd_cleanup(args):
+    """Memory cleanup — detectare și marcare stale."""
+    script = V2_SCRIPTS_DIR / "memory_cleanup.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args and args[0] in ("report", "mark"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script), "report"] + args
+    subprocess.run(cmd)
+
+
+def cmd_promote(args):
+    """Fact promotion — scanare și promovare automată."""
+    script = V2_SCRIPTS_DIR / "fact_promoter.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args and args[0] in ("scan", "list", "promote"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script), "promote"] + args
+    subprocess.run(cmd)
+
+
+def cmd_dashboard(args):
+    """Dashboard complet proiect curent."""
+    script = V2_SCRIPTS_DIR / "dashboard_cli.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    cmd = ["python3", str(script)] + args
+    subprocess.run(cmd)
+
+
+def cmd_checkpoint(args):
+    """Gestionare checkpoints."""
+    script = V2_SCRIPTS_DIR / "checkpoint_manager.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args and args[0] in ("create", "list", "show", "restore"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script), "list"] + args
+    subprocess.run(cmd)
+
+
+def cmd_timeline(args):
+    """Vizualizare cronologică evenimente."""
+    script = V2_SCRIPTS_DIR / "timeline.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    cmd = ["python3", str(script)] + args
+    subprocess.run(cmd)
+
+
+def cmd_activity(args):
+    """Vizualizare activitate agenți."""
+    script = V2_SCRIPTS_DIR / "activity_log.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    cmd = ["python3", str(script)] + args
+    subprocess.run(cmd)
+
+
+def cmd_events(args):
+    """Vizualizare agent event stream."""
+    script = V2_SCRIPTS_DIR / "agent_events.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    cmd = ["python3", str(script)] + args
+    subprocess.run(cmd)
+
+
+def cmd_branch(args):
+    """Gestionare memory branches."""
+    script = V2_SCRIPTS_DIR / "branch_manager.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+    if args and args[0] in ("create", "list", "current", "switch", "diff", "compare", "replay", "merge", "conflicts", "delete"):
+        cmd = ["python3", str(script)] + args
+    else:
+        cmd = ["python3", str(script), "list"] + args
+    subprocess.run(cmd)
+
+
+def cmd_resolve(args):
+    """Gestionare rezolvări erori."""
+    script = V2_SCRIPTS_DIR / "error_resolution.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    if args and args[0] in ("list", "show", "search"):
+        cmd = ["python3", str(script)] + args
+    else:
+        # Default: add — primul arg e error_id
+        # mem resolve <id> -s "..." → error_resolution.py add --error-id <id> -s "..."
+        if args and args[0].isdigit():
+            cmd = ["python3", str(script), "add", "--error-id"] + args
+        else:
+            cmd = ["python3", str(script), "add"] + args
+
+    subprocess.run(cmd)
+
+
+def cmd_review(args):
+    """Review auto-extracted items."""
+    conn = get_db()
+    cursor = conn.cursor()
+
+    sub = args[0] if args else "pending"
+
+    if sub == "pending":
+        # List pending items
+        for table, item_type, text_col, active_filter in [
+            ("decisions", "DECISION", "title", "status='active'"),
+            ("learned_facts", "FACT", "fact", "is_active=1"),
+            ("error_resolutions", "RESOLUTION", "resolution", "1=1"),
+        ]:
+            try:
+                cursor.execute(
+                    f"SELECT id, {text_col}, extraction_confidence, topics, created_at "
+                    f"FROM {table} WHERE auto_extracted=1 AND {active_filter} "
+                    f"ORDER BY created_at DESC LIMIT 20"
+                )
+                rows = cursor.fetchall()
+                if rows:
+                    print(f"\n  [{item_type}] ({len(rows)} pending)")
+                    for r in rows:
+                        topics = f" [{r[3]}]" if r[3] else ""
+                        print(f"    #{r[0]} (conf={r[2]:.2f}{topics}) {r[1][:60]}")
+            except Exception:
+                pass
+
+    elif sub == "approve" and len(args) >= 3:
+        item_type, item_id = args[1], int(args[2])
+        updates = {
+            "decision": ("decisions", "confidence='confirmed', auto_extracted=2"),
+            "fact": ("learned_facts", "confidence='confirmed', auto_extracted=2"),
+            "resolution": ("error_resolutions", "worked=1, auto_extracted=2"),
+        }
+        if item_type in updates:
+            table, sql = updates[item_type]
+            cursor.execute(f"UPDATE {table} SET {sql} WHERE id=?", (item_id,))
+            conn.commit()
+            print(f"  ✅ Approved {item_type} #{item_id}")
+        else:
+            print(f"  ❌ Tip necunoscut: {item_type}")
+
+    elif sub == "reject" and len(args) >= 3:
+        item_type, item_id = args[1], int(args[2])
+        updates = {
+            "decision": ("decisions", "status='rejected', auto_extracted=-1"),
+            "fact": ("learned_facts", "is_active=0, auto_extracted=-1"),
+            "resolution": ("error_resolutions", "worked=0, auto_extracted=-1"),
+        }
+        if item_type in updates:
+            table, sql = updates[item_type]
+            cursor.execute(f"UPDATE {table} SET {sql} WHERE id=?", (item_id,))
+            conn.commit()
+            print(f"  ❌ Rejected {item_type} #{item_id}")
+        else:
+            print(f"  ❌ Tip necunoscut: {item_type}")
+
+    elif sub == "stats":
+        for table, item_type in [("decisions", "decision"), ("learned_facts", "fact"), ("error_resolutions", "resolution")]:
+            try:
+                cursor.execute(f"SELECT COUNT(*) FROM {table} WHERE auto_extracted=1")
+                pending = cursor.fetchone()[0]
+                cursor.execute(f"SELECT COUNT(*) FROM {table} WHERE auto_extracted=2")
+                approved = cursor.fetchone()[0]
+                cursor.execute(f"SELECT COUNT(*) FROM {table} WHERE auto_extracted=-1")
+                rejected = cursor.fetchone()[0]
+                print(f"  {item_type}: pending={pending} approved={approved} rejected={rejected}")
+            except Exception:
+                pass
+    else:
+        print("  Usage: mem review [pending|approve|reject|stats]")
+        print("    mem review pending           — Items de revizuit")
+        print("    mem review approve <type> <id> — Aprobă item")
+        print("    mem review reject <type> <id>  — Rejectează item")
+        print("    mem review stats              — Statistici review")
+
+    conn.close()
+
+
+def cmd_orch(args):
+    """Orchestrare multi-agent (18D-20). Requires Pro license."""
+    if not args:
+        args = ["help"]
+
+    subcmd = args[0]
+
+    # License gate (only active when ORCH_LICENSE_CHECK=1)
+    if subcmd != "help" and subcmd not in ("", None):
+        if os.environ.get("ORCH_LICENSE_CHECK") == "1":
+            try:
+                sys.path.insert(0, str(V2_SCRIPTS_DIR))
+                from license_gate import require_premium
+                require_premium("orchestration")
+            except SystemExit:
+                return
+            except ImportError:
+                pass
+    sub_args = args[1:]
+
+    # Detectăm CLI-ul curent din env sau default
+    cli_name = os.environ.get("MEMORY_AGENT_NAME", "claude-code")
+
+    if subcmd == "create":
+        if not sub_args:
+            print("  Usage: mem orch create <title> [description]")
+            return
+        title = sub_args[0]
+        desc = sub_args[1] if len(sub_args) > 1 else ""
+        script = V2_SCRIPTS_DIR / "orchestrator.py"
+        subprocess.run(["python3", str(script), "create-project", title, desc, cli_name])
+
+    elif subcmd == "status":
+        script = V2_SCRIPTS_DIR / "orchestrator.py"
+        if sub_args:
+            subprocess.run(["python3", str(script), "status", sub_args[0]])
+        else:
+            # Listează toate proiectele active
+            sys.path.insert(0, str(V2_SCRIPTS_DIR))
+            from v2_common import get_db as v2_get_db
+            conn = v2_get_db()
+            cur = conn.cursor()
+            cur.execute("SELECT id, title, orchestrator_cli, status, created_at FROM orchestration_projects ORDER BY created_at DESC LIMIT 10")
+            rows = cur.fetchall()
+            conn.close()
+            if not rows:
+                print("  Niciun proiect orchestrat.")
+            else:
+                print(f"  {'ID':<5} {'Titlu':<30} {'Orchestrator':<15} {'Status':<10} {'Creat':<16}")
+                print(f"  {'-'*5} {'-'*30} {'-'*15} {'-'*10} {'-'*16}")
+                for r in rows:
+                    print(f"  {r[0]:<5} {r[1][:30]:<30} {r[2]:<15} {r[3]:<10} {str(r[4])[:16]:<16}")
+
+    elif subcmd == "add-task":
+        if len(sub_args) < 3:
+            print("  Usage: mem orch add-task <project_id> <title> <description> [--type X] [--priority X] [--skills a,b]")
+            return
+        script = V2_SCRIPTS_DIR / "orchestrator.py"
+        cmd = ["python3", str(script), "add-task"] + sub_args + ["--created-by", cli_name]
+        subprocess.run(cmd)
+
+    elif subcmd == "tasks":
+        script = V2_SCRIPTS_DIR / "orchestrator.py"
+        if "--mine" in sub_args:
+            subprocess.run(["python3", str(script), "my-tasks", cli_name])
+        elif "--available" in sub_args:
+            subprocess.run(["python3", str(script), "tasks", cli_name])
+        else:
+            subprocess.run(["python3", str(script), "tasks"])
+
+    elif subcmd == "claim":
+        if not sub_args:
+            print("  Usage: mem orch claim <task_id>")
+            return
+        script = V2_SCRIPTS_DIR / "orchestrator.py"
+        subprocess.run(["python3", str(script), "claim", sub_args[0], cli_name])
+
+    elif subcmd == "done":
+        if not sub_args:
+            print("  Usage: mem orch done <task_id> [summary]")
+            return
+        # Trebuie lease_token — îl citim din task
+        sys.path.insert(0, str(V2_SCRIPTS_DIR))
+        from v2_common import get_db as v2_get_db
+        conn = v2_get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT lease_token FROM orch_tasks WHERE id = ? AND assigned_cli = ?",
+                     (int(sub_args[0]), cli_name))
+        row = cur.fetchone()
+        conn.close()
+        if not row or not row[0]:
+            print(f"  ❌ Nu ai lease pe task #{sub_args[0]}")
+            return
+        summary = sub_args[1] if len(sub_args) > 1 else ""
+        script = V2_SCRIPTS_DIR / "orchestrator.py"
+        subprocess.run(["python3", str(script), "complete", sub_args[0], row[0], summary])
+
+    elif subcmd == "deliberate":
+        if not sub_args:
+            print("  Usage: mem orch deliberate <topic> [--type quick|deep|expert]")
+            return
+        script = V2_SCRIPTS_DIR / "deliberation.py"
+        cmd = ["python3", str(script), "create", sub_args[0], "--started-by", cli_name]
+        for i, arg in enumerate(sub_args[1:], 1):
+            if arg == "--type" and i + 1 < len(sub_args):
+                cmd += ["--type", sub_args[i + 1]]
+        subprocess.run(cmd)
+
+    elif subcmd == "propose":
+        if len(sub_args) < 2:
+            print("  Usage: mem orch propose <session_id> <content> [--confidence 0.8]")
+            return
+        script = V2_SCRIPTS_DIR / "deliberation.py"
+        cmd = ["python3", str(script), "propose", sub_args[0], cli_name, sub_args[1]]
+        for i, arg in enumerate(sub_args[2:], 2):
+            if arg == "--confidence" and i + 1 < len(sub_args):
+                cmd += ["--confidence", sub_args[i + 1]]
+        subprocess.run(cmd)
+
+    elif subcmd == "vote":
+        if len(sub_args) < 2:
+            print("  Usage: mem orch vote <session_id> <option> [reasoning]")
+            return
+        script = V2_SCRIPTS_DIR / "deliberation.py"
+        cmd = ["python3", str(script), "vote", sub_args[0], cli_name, sub_args[1]]
+        if len(sub_args) > 2:
+            cmd.append(sub_args[2])
+        subprocess.run(cmd)
+
+    elif subcmd == "send":
+        if len(sub_args) < 2:
+            print("  Usage: mem orch send <to_cli|all> <message> [--type info|question|review]")
+            return
+        script = V2_SCRIPTS_DIR / "orchestrator.py"
+        to = sub_args[0] if sub_args[0] != "all" else None
+        cmd = ["python3", str(script), "send", cli_name, sub_args[1]]
+        if to:
+            cmd += ["--to", to]
+        for i, arg in enumerate(sub_args[2:], 2):
+            if arg == "--type" and i + 1 < len(sub_args):
+                cmd += ["--type", sub_args[i + 1]]
+        subprocess.run(cmd)
+
+    elif subcmd == "messages":
+        script = V2_SCRIPTS_DIR / "orchestrator.py"
+        cmd = ["python3", str(script), "messages", "--to", cli_name]
+        if "--unread" in sub_args:
+            cmd.append("--unread")
+        subprocess.run(cmd)
+
+    elif subcmd == "agents":
+        script = V2_SCRIPTS_DIR / "orchestrator.py"
+        subprocess.run(["python3", str(script), "agents"])
+
+    elif subcmd == "daemon":
+        script = V2_SCRIPTS_DIR / "orch_daemon.py"
+        cmd = ["python3", str(script)]
+        if "--once" in sub_args:
+            cmd.append("--once")
+        subprocess.run(cmd)
+
+    elif subcmd == "launch":
+        script = V2_SCRIPTS_DIR / "cli_launcher.py"
+        if len(sub_args) < 2:
+            print("  Usage: mem orch launch <cli_name> --task <id> [--timeout 300] [--perm safe|auto|unsafe]")
+            print("         mem orch launch <cli_name> --deliberate <session_id>")
+            print("         mem orch launch <cli_name> --prompt 'text'")
+            return
+        cli_name = sub_args[0]
+        cmd = ["python3", str(script)]
+        if "--task" in sub_args:
+            idx = sub_args.index("--task")
+            cmd += ["task", cli_name, sub_args[idx + 1]]
+        elif "--deliberate" in sub_args:
+            idx = sub_args.index("--deliberate")
+            cmd += ["deliberate", cli_name, sub_args[idx + 1]]
+        elif "--prompt" in sub_args:
+            idx = sub_args.index("--prompt")
+            cmd += ["prompt", cli_name, sub_args[idx + 1]]
+        else:
+            print("  Specifică --task, --deliberate, sau --prompt")
+            return
+        # Pass through optional flags
+        for flag in ["--timeout", "--perm", "--dir"]:
+            if flag in sub_args:
+                fi = sub_args.index(flag)
+                if fi + 1 < len(sub_args):
+                    cmd += [flag, sub_args[fi + 1]]
+        subprocess.run(cmd)
+
+    elif subcmd == "launches":
+        script = V2_SCRIPTS_DIR / "cli_launcher.py"
+        subprocess.run(["python3", str(script), "launches"])
+
+    elif subcmd == "deliberate-auto":
+        if len(sub_args) < 1:
+            print("  Usage: mem orch deliberate-auto <question> [--type deep] [--timeout 120]")
+            return
+        script = V2_SCRIPTS_DIR / "auto_loop.py"
+        cmd = ["python3", str(script), "deliberate", sub_args[0]]
+        for flag in ["--type", "--timeout", "--perm", "--participants"]:
+            if flag in sub_args:
+                fi = sub_args.index(flag)
+                if fi + 1 < len(sub_args):
+                    cmd += [flag, sub_args[fi + 1]]
+        subprocess.run(cmd)
+
+    elif subcmd == "run-project":
+        if len(sub_args) < 1:
+            print("  Usage: mem orch run-project <project_id> [--timeout 300] [--review]")
+            return
+        script = V2_SCRIPTS_DIR / "auto_loop.py"
+        cmd = ["python3", str(script), "run-project", sub_args[0]]
+        for flag in ["--timeout", "--perm"]:
+            if flag in sub_args:
+                fi = sub_args.index(flag)
+                if fi + 1 < len(sub_args):
+                    cmd += [flag, sub_args[fi + 1]]
+        if "--review" in sub_args:
+            cmd.append("--review")
+        if "--auto-fix" in sub_args:
+            cmd.append("--auto-fix")
+        subprocess.run(cmd)
+
+    elif subcmd == "review":
+        if len(sub_args) < 1:
+            print("  Usage: mem orch review <task_id> --by <cli_name>")
+            return
+        task_id = sub_args[0]
+        reviewer = "gemini-cli"
+        if "--by" in sub_args:
+            idx = sub_args.index("--by")
+            if idx + 1 < len(sub_args):
+                reviewer = sub_args[idx + 1]
+        script = V2_SCRIPTS_DIR / "cli_launcher.py"
+        # Use python to call launch_for_review
+        subprocess.run(["python3", "-c",
+            f"import sys; sys.path.insert(0,'{V2_SCRIPTS_DIR}'); "
+            f"from cli_launcher import launch_for_review; "
+            f"import json; r=launch_for_review('{reviewer}',{task_id}); "
+            f"print(json.dumps(r,indent=2,default=str,ensure_ascii=False))"])
+
+    elif subcmd == "reviews":
+        import sqlite3
+        conn = sqlite3.connect(str(DB_PATH))
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        query = "SELECT r.id, r.task_id, r.reviewer_cli, r.verdict, r.severity, r.original_cli, r.created_at FROM orch_reviews r"
+        params = []
+        conditions = []
+        if "--task" in sub_args:
+            idx = sub_args.index("--task")
+            if idx + 1 < len(sub_args):
+                conditions.append("r.task_id = ?")
+                params.append(int(sub_args[idx + 1]))
+        if "--verdict" in sub_args:
+            idx = sub_args.index("--verdict")
+            if idx + 1 < len(sub_args):
+                conditions.append("r.verdict = ?")
+                params.append(sub_args[idx + 1])
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        query += " ORDER BY r.created_at DESC LIMIT 20"
+        cur.execute(query, params)
+        rows = cur.fetchall()
+        conn.close()
+        if not rows:
+            print("  Niciun review găsit.")
+        else:
+            print(f"  {'ID':<5} {'Task':<6} {'Reviewer':<15} {'Verdict':<20} {'Severity':<10} {'Original':<15} {'Creat':<16}")
+            print("  " + "-" * 87)
+            for r in rows:
+                print(f"  {r['id']:<5} #{r['task_id']:<5} {r['reviewer_cli']:<15} {r['verdict']:<20} {r['severity']:<10} {r['original_cli'] or '-':<15} {r['created_at'][:16]}")
+
+    elif subcmd == "replay":
+        if len(sub_args) < 1:
+            print("  Usage: mem orch replay <project_id> [--json]")
+            return
+        script = V2_SCRIPTS_DIR / "replay.py"
+        cmd = ["python3", str(script), "project", sub_args[0]]
+        if "--json" in sub_args:
+            cmd.append("--json")
+        subprocess.run(cmd)
+
+    elif subcmd == "replay-delib":
+        if len(sub_args) < 1:
+            print("  Usage: mem orch replay-delib <session_id> [--json]")
+            return
+        script = V2_SCRIPTS_DIR / "replay.py"
+        cmd = ["python3", str(script), "deliberation", sub_args[0]]
+        if "--json" in sub_args:
+            cmd.append("--json")
+        subprocess.run(cmd)
+
+    elif subcmd == "capabilities":
+        script = V2_SCRIPTS_DIR / "intelligence.py"
+        subprocess.run(["python3", str(script), "leaderboard"])
+
+    elif subcmd == "skills":
+        if len(sub_args) < 1:
+            # All CLIs
+            script = V2_SCRIPTS_DIR / "intelligence.py"
+            subprocess.run(["python3", "-c",
+                f"import sys; sys.path.insert(0,'{V2_SCRIPTS_DIR}'); "
+                f"from intelligence import get_learned_skills; "
+                f"from v2_common import VALID_CLI_NAMES; "
+                f"import json; "
+                f"[print(f'  {{cli}}:', json.dumps(get_learned_skills(cli), indent=4)) for cli in VALID_CLI_NAMES]"])
+        else:
+            cli_name = sub_args[0]
+            subprocess.run(["python3", "-c",
+                f"import sys; sys.path.insert(0,'{V2_SCRIPTS_DIR}'); "
+                f"from intelligence import get_learned_skills; "
+                f"import json; print(json.dumps(get_learned_skills('{cli_name}'), indent=2))"])
+
+    else:
+        print("  Orchestration — Comenzi:")
+        print("    mem orch create <title>           — Creează proiect")
+        print("    mem orch status [project_id]      — Status")
+        print("    mem orch add-task <p> <t> <d>     — Adaugă task")
+        print("    mem orch tasks [--mine|--available]— Listează task-uri")
+        print("    mem orch claim <task_id>          — Claim task")
+        print("    mem orch done <task_id> [summary] — Marchează done")
+        print("    mem orch deliberate <topic>       — Pornește deliberare manuală")
+        print("    mem orch propose <sid> <text>     — Propunere")
+        print("    mem orch vote <sid> <option>      — Votează")
+        print("    mem orch send <to> <mesaj>        — Mesaj inter-agent")
+        print("    mem orch messages [--unread]      — Citește mesaje")
+        print("    mem orch agents                   — Status agenți")
+        print("    mem orch daemon [--once]          — Housekeeping daemon")
+        print("    mem orch launch <cli> --task <id> — Lansează CLI pentru task")
+        print("    mem orch launches                 — Listează launch-uri active")
+        print("    mem orch deliberate-auto <q>      — Deliberare AUTOMATĂ")
+        print("    mem orch run-project <id> [--review] — Rulează task-uri (+auto review)")
+        print("    mem orch review <task_id> --by <cli> — Peer review pe un task")
+        print("    mem orch reviews [--task X]       — Listează reviews")
+        print("    mem orch replay <project_id>      — Timeline proiect")
+        print("    mem orch replay-delib <session_id> — Timeline deliberare")
+        print("    mem orch capabilities             — Leaderboard capabilities")
+
+
+def cmd_model(args):
+    """Gestionare model/provider curent."""
+    script = V2_SCRIPTS_DIR / "model_logger.py"
+    if not script.exists():
+        print(f"❌ Script lipsă: {script}")
+        return
+
+    if args and args[0] in ("set", "show", "clear"):
+        cmd = ["python3", str(script)] + args
+    else:
+        # Default: show
+        cmd = ["python3", str(script), "show"] + args
+
+    subprocess.run(cmd)
+
+
+def main():
+    if len(sys.argv) < 2:
+        cmd_help()
+        return
+
+    command = sys.argv[1].lower()
+    args = sys.argv[2:]
+
+    commands = {
+        "help": lambda: cmd_help(),
+        "backup": lambda: cmd_backup(args),
+        "doctor": lambda: cmd_doctor(args),
+        "quarantine": lambda: cmd_quarantine(args),
+        "panic": lambda: cmd_panic(args),
+        "status": lambda: cmd_status(args),
+        "audit": lambda: cmd_audit(args),
+        "fp": lambda: cmd_fp(args),
+        "search": lambda: cmd_search(args),
+        "err": lambda: cmd_err(args),
+        "error": lambda: cmd_err(args),
+        "errors": lambda: cmd_err(args),
+        "stats": lambda: cmd_stats(),
+        "trace": lambda: cmd_trace(args),
+        "reconcile": lambda: cmd_reconcile(args),
+        "reload": lambda: cmd_reload(args),
+        # V2: Decisions + Facts
+        "decide": lambda: cmd_decide(args),
+        "decisions": lambda: cmd_decisions(args),
+        "learn": lambda: cmd_learn(args),
+        "pin": lambda: cmd_pin(args),
+        "unpin": lambda: cmd_unpin(args),
+        # V2: Goals, Tasks, Projects
+        "goal": lambda: cmd_goal(args),
+        "task": lambda: cmd_task(args),
+        "project": lambda: cmd_project(args),
+        # V2C: Error Intelligence + Model Attribution
+        "resolve": lambda: cmd_resolve(args),
+        "model": lambda: cmd_model(args),
+        # V2: Context Builder + Intent + Strategy
+        "context": lambda: cmd_context(args),
+        "intent": lambda: cmd_intent(args),
+        "strategy": lambda: cmd_strategy(args),
+        # V4: Intelligence Layer
+        "patterns": lambda: cmd_patterns(args),
+        "intelligence": lambda: cmd_intelligence(args),
+        "cleanup": lambda: cmd_cleanup(args),
+        "promote": lambda: cmd_promote(args),
+        # V5A: Checkpoints + Timeline
+        "dashboard": lambda: cmd_dashboard(args),
+        "checkpoint": lambda: cmd_checkpoint(args),
+        "timeline": lambda: cmd_timeline(args),
+        # V5E: Activity Log
+        "activity": lambda: cmd_activity(args),
+        # V12A: Agent Event Stream
+        "events": lambda: cmd_events(args),
+        # V9: Memory Branches
+        "branch": lambda: cmd_branch(args),
+        # V15B: Cognitive Memory
+        "errorlearn": lambda: cmd_errorlearn(args),
+        # V15C: Cognitive Memory Stage 2
+        "replay": lambda: cmd_replay(args),
+        "learnings": lambda: cmd_learnings(args),
+        # V15D: Memory Intelligence Layer
+        "score": lambda: cmd_score(args),
+        "graph": lambda: cmd_graph(args),
+        "suggest": lambda: cmd_suggest(args),
+        # 18C: Review auto-extracted items
+        "review": lambda: cmd_review(args),
+        # 18D: Orchestration
+        "orch": lambda: cmd_orch(args),
+    }
+
+    if command in commands:
+        commands[command]()
+    else:
+        print(f"❌ Comandă necunoscută: {command}")
+        print("   Folosește: mem help")
+
+if __name__ == "__main__":
+    main()

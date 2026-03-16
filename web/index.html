@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Control Center</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="topbar">
+            <div class="topbar-brand">
+                <h1>Memory Control Center</h1>
+            </div>
+            <div class="topbar-meta" id="topbar-meta"></div>
+            <div class="topbar-actions">
+                <select id="topbar-intent" onchange="doSetIntent(this.value)" title="Set Intent">
+                    <option value="">Intent...</option>
+                    <option value="debugging">debugging</option>
+                    <option value="feature">feature</option>
+                    <option value="refactor">refactor</option>
+                    <option value="deploy">deploy</option>
+                    <option value="docs">docs</option>
+                    <option value="review">review</option>
+                    <option value="explore">explore</option>
+                </select>
+                <button class="btn btn-sm" onclick="showSetModelDialog()" title="Set Model">Model</button>
+                <button class="btn btn-sm" onclick="showCreateCheckpointDialog()" title="Create Checkpoint">Checkpoint</button>
+                <button class="btn btn-icon" onclick="refreshDashboard()" title="Refresh Dashboard">&#x21bb;</button>
+            </div>
+        </header>
+
+        <nav class="nav" id="main-nav">
+            <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+            <button class="nav-btn" data-tab="decisions">Decisions</button>
+            <button class="nav-btn" data-tab="facts">Facts</button>
+            <button class="nav-btn" data-tab="goals-tasks">Goals &amp; Tasks</button>
+            <button class="nav-btn" data-tab="timeline">Timeline</button>
+            <button class="nav-btn" data-tab="context">Context</button>
+            <button class="nav-btn" data-tab="health">Health</button>
+            <button class="nav-btn" data-tab="activity">Activity</button>
+            <button class="nav-btn" data-tab="errors">Errors</button>
+            <button class="nav-btn" data-tab="branches">Branches</button>
+            <button class="nav-btn" data-tab="events">Events</button>
+            <span class="nav-sep"></span>
+            <button class="nav-btn" data-tab="orchestration">Orchestration</button>
+            <span class="nav-sep"></span>
+            <button class="nav-btn nav-dim" data-tab="sessions">Sessions</button>
+            <button class="nav-btn nav-dim" data-tab="search">Search</button>
+        </nav>
+
+        <main id="main-content">
+            <!-- DASHBOARD -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <div class="overview-row" id="overview-cards"></div>
+                <div class="grid-2col">
+                    <div class="panel" id="dash-decisions"><div class="panel-hdr"><h3>Active Decisions</h3></div><div class="panel-body ph">Loading...</div></div>
+                    <div class="panel" id="dash-facts"><div class="panel-hdr"><h3>Key Facts</h3></div><div class="panel-body ph">Loading...</div></div>
+                    <div class="panel" id="dash-goals"><div class="panel-hdr"><h3>Goals</h3></div><div class="panel-body ph">Loading...</div></div>
+                    <div class="panel" id="dash-tasks"><div class="panel-hdr"><h3>Active Tasks</h3></div><div class="panel-body ph">Loading...</div></div>
+                    <div class="panel" id="dash-errors"><div class="panel-hdr"><h3>Error Intelligence</h3></div><div class="panel-body ph">Loading...</div></div>
+                    <div class="panel" id="dash-timeline"><div class="panel-hdr"><h3>Recent Timeline</h3></div><div class="panel-body ph">Loading...</div></div>
+                    <div class="panel" id="dash-activity"><div class="panel-hdr"><h3>Agent Activity</h3></div><div class="panel-body ph">Loading...</div></div>
+                </div>
+            </section>
+
+            <!-- DECISIONS -->
+            <section id="tab-decisions" class="tab-pane">
+                <div class="tab-toolbar">
+                    <select id="decisions-status" onchange="loadDecisionsTab()">
+                        <option value="active">Active</option>
+                        <option value="all">All</option>
+                        <option value="superseded">Superseded</option>
+                        <option value="archived">Archived</option>
+                    </select>
+                    <button class="btn btn-icon" onclick="loadDecisionsTab()">&#x21bb;</button>
+                </div>
+                <div id="decisions-list" class="detail-list ph">Loading...</div>
+            </section>
+
+            <!-- FACTS -->
+            <section id="tab-facts" class="tab-pane">
+                <div class="tab-toolbar">
+                    <select id="facts-filter" onchange="loadFactsTab()">
+                        <option value="">All Active</option>
+                        <option value="true">Pinned Only</option>
+                        <option value="false">Unpinned Only</option>
+                    </select>
+                    <button class="btn btn-icon" onclick="loadFactsTab()">&#x21bb;</button>
+                </div>
+                <div id="facts-list" class="detail-list ph">Loading...</div>
+            </section>
+
+            <!-- GOALS & TASKS -->
+            <section id="tab-goals-tasks" class="tab-pane">
+                <div class="grid-2col">
+                    <div>
+                        <div class="tab-toolbar"><h2 class="sec-title">Goals</h2>
+                            <select id="goals-status" onchange="loadGoalsTasksTab()">
+                                <option value="active">Active</option>
+                                <option value="all">All</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div id="goals-detail" class="detail-list ph">Loading...</div>
+                    </div>
+                    <div>
+                        <div class="tab-toolbar"><h2 class="sec-title">Tasks</h2>
+                            <select id="tasks-status" onchange="loadGoalsTasksTab()">
+                                <option value="">Active (all)</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="blocked">Blocked</option>
+                                <option value="todo">Todo</option>
+                                <option value="done">Done</option>
+                            </select>
+                        </div>
+                        <div id="tasks-detail" class="detail-list ph">Loading...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TIMELINE -->
+            <section id="tab-timeline" class="tab-pane">
+                <div class="tab-toolbar">
+                    <select id="timeline-days" onchange="loadTimelineTab()">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                    <button class="btn btn-icon" onclick="loadTimelineTab()">&#x21bb;</button>
+                </div>
+                <div id="timeline-detail" class="detail-list ph">Loading...</div>
+            </section>
+
+            <!-- CONTEXT -->
+            <section id="tab-context" class="tab-pane">
+                <div class="tab-toolbar">
+                    <select id="context-mode" onchange="loadContextTab()">
+                        <option value="compact">Compact</option>
+                        <option value="full">Full</option>
+                        <option value="survival">Survival</option>
+                    </select>
+                    <button class="btn btn-icon" onclick="loadContextTab()">&#x21bb;</button>
+                </div>
+                <div id="context-preview" class="ph">Loading...</div>
+            </section>
+
+            <!-- HEALTH -->
+            <section id="tab-health" class="tab-pane">
+                <div class="tab-toolbar">
+                    <button class="btn btn-icon" onclick="loadHealthTab()">&#x21bb;</button>
+                </div>
+                <div id="health-detail" class="ph">Loading...</div>
+            </section>
+
+            <!-- ACTIVITY -->
+            <section id="tab-activity" class="tab-pane">
+                <div class="tab-toolbar">
+                    <select id="activity-type" onchange="loadActivityTab()">
+                        <option value="">All Types</option>
+                        <option value="decision">Decision</option>
+                        <option value="learn">Learn</option>
+                        <option value="goal">Goal</option>
+                        <option value="task">Task</option>
+                        <option value="resolve">Resolve</option>
+                        <option value="checkpoint">Checkpoint</option>
+                        <option value="profile">Profile</option>
+                    </select>
+                    <label class="chk-label"><input type="checkbox" id="activity-failed" onchange="loadActivityTab()"> Failed only</label>
+                    <button class="btn btn-icon" onclick="loadActivityTab()">&#x21bb;</button>
+                </div>
+                <div id="activity-list" class="detail-list ph">Loading...</div>
+            </section>
+
+            <!-- ERRORS -->
+            <section id="tab-errors" class="tab-pane">
+                <div class="tab-toolbar">
+                    <select id="errors-filter" onchange="loadErrorsTab()">
+                        <option value="all">All Errors</option>
+                        <option value="unresolved">Unresolved</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                    <button class="btn btn-icon" onclick="loadErrorsTab()">&#x21bb;</button>
+                </div>
+                <div id="errors-list" class="detail-list ph">Loading...</div>
+            </section>
+
+            <!-- BRANCHES -->
+            <section id="tab-branches" class="tab-pane">
+                <div class="tab-toolbar">
+                    <h2 class="sec-title">Memory Branches</h2>
+                    <button class="btn btn-icon" onclick="loadBranchesTab()">&#x21bb;</button>
+                </div>
+                <div id="branches-content" class="ph">Loading...</div>
+            </section>
+
+            <!-- EVENTS -->
+            <section id="tab-events" class="tab-pane">
+                <div class="tab-toolbar">
+                    <select id="events-type" onchange="loadEventsTab()">
+                        <option value="">All Types</option>
+                        <option value="agent_started">Agent Started</option>
+                        <option value="agent_finished">Agent Finished</option>
+                        <option value="agent_error">Agent Error</option>
+                        <option value="context_requested">Context Requested</option>
+                        <option value="context_received">Context Received</option>
+                        <option value="decision_created">Decision Created</option>
+                        <option value="fact_created">Fact Created</option>
+                        <option value="goal_created">Goal Created</option>
+                        <option value="task_created">Task Created</option>
+                        <option value="task_updated">Task Updated</option>
+                        <option value="resolution_created">Resolution Created</option>
+                        <option value="branch_switched">Branch Switched</option>
+                        <option value="branch_compared">Branch Compared</option>
+                        <option value="branch_merged">Branch Merged</option>
+                        <option value="checkpoint_created">Checkpoint Created</option>
+                        <option value="checkpoint_restored">Checkpoint Restored</option>
+                        <option value="api_call">API Call</option>
+                        <option value="ui_action">UI Action</option>
+                    </select>
+                    <input type="text" id="events-agent" placeholder="Agent name..." style="max-width:160px" onchange="loadEventsTab()">
+                    <input type="text" id="events-model" placeholder="Model..." style="max-width:140px" onchange="loadEventsTab()">
+                    <input type="text" id="events-branch" placeholder="Branch..." style="max-width:130px" onchange="loadEventsTab()">
+                    <label class="chk-label"><input type="checkbox" id="events-failed" onchange="loadEventsTab()"> Failed only</label>
+                    <button class="btn btn-icon" onclick="loadEventsTab()">&#x21bb;</button>
+                </div>
+                <div id="events-list" class="detail-list ph">Loading...</div>
+            </section>
+
+            <!-- ORCHESTRATION (18E) -->
+            <section id="tab-orchestration" class="tab-pane">
+                <div class="tab-toolbar">
+                    <select id="orch-view" onchange="loadOrch()">
+                        <option value="projects">Projects</option>
+                        <option value="tasks">Tasks</option>
+                        <option value="agents">Agents</option>
+                        <option value="deliberation">Deliberation</option>
+                        <option value="messages">Messages</option>
+                        <option value="reviews">Reviews</option>
+                    </select>
+                    <select id="orch-project-filter" onchange="loadOrch()">
+                        <option value="">All Projects</option>
+                    </select>
+                    <button class="btn btn-icon" onclick="loadOrch()">&#x21bb;</button>
+                </div>
+                <div id="orch-content" class="detail-list ph">Select a view...</div>
+            </section>
+
+            <!-- SESSIONS (V1) -->
+            <section id="tab-sessions" class="tab-pane">
+                <div class="tab-toolbar">
+                    <input type="text" id="session-filter" placeholder="Filter by project...">
+                    <button class="btn btn-icon" onclick="loadSessions()">&#x21bb;</button>
+                </div>
+                <div id="sessions-list" class="ph">Loading...</div>
+                <div class="pagination" id="sessions-pagination"></div>
+            </section>
+
+            <!-- SEARCH (V1) -->
+            <section id="tab-search" class="tab-pane">
+                <div class="tab-toolbar">
+                    <input type="text" id="search-query" placeholder="Search memory..." class="flex-1">
+                    <select id="search-mode">
+                        <option value="hybrid">Hybrid</option>
+                        <option value="keyword">Keyword</option>
+                        <option value="vector">Vector</option>
+                    </select>
+                    <button class="btn btn-sm" onclick="doSearch()">Search</button>
+                </div>
+                <div id="search-results"></div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <span>Memory Control Center v2</span>
+            <span id="footer-info"></span>
+        </footer>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Database (user-specific, not shipped)
+global.db
+global.db-wal
+global.db-shm
+
+# Logs
+*.log
+logs/
+
+# Backups (user-specific)
+backups/
+exports/
+sessions/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+*.key
+
+# Test artifacts
+tests/test_*.db

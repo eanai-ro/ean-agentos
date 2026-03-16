@@ -1,0 +1,9 @@
+# Universal Agent Memory — Python dependencies
+# Core (required)
+flask>=3.0
+
+# Optional: MCP Server
+mcp>=1.0
+
+# Optional: CORS support for web dashboard
+flask-cors>=4.0
