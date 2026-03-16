@@ -42,7 +42,7 @@ mem panic panic --scan-only
 
 **Ce face**:
 1. **Freeze** (optional) - setează panic mode (blochează scrieri noi)
-2. **Backup atomic** în `/tmp/claude_PANIC_<timestamp>/`
+2. **Backup atomic** în `/tmp/ean_PANIC_<timestamp>/`
    - DB + WAL/SHM
    - Logs (*.log)
    - State files (.*.json)
@@ -64,7 +64,7 @@ mem panic panic --scan-only
 ```
 🚨 PANIC MODE - INCIDENT RESPONSE
 
-📦 Backup: /tmp/claude_PANIC_20260207_234649
+📦 Backup: /tmp/ean_PANIC_20260207_234649
 📊 Total hits: 426
    CRITICAL: 110
    HIGH: 140
@@ -158,7 +158,7 @@ Următoarele pattern-uri sunt **excluse automat**:
 ## Structura Backup
 
 ```
-/tmp/claude_PANIC_20260207_234649/
+/tmp/ean_PANIC_20260207_234649/
 ├── global.db                    # DB backup (atomic via SQLite .backup)
 ├── global.db-wal               # WAL file (dacă există)
 ├── global.db-shm               # SHM file (dacă există)
@@ -172,7 +172,7 @@ Următoarele pattern-uri sunt **excluse automat**:
 ```json
 {
   "timestamp": "2026-02-07T23:46:49+02:00",
-  "backup_dir": "/tmp/claude_PANIC_20260207_234649",
+  "backup_dir": "/tmp/ean_PANIC_20260207_234649",
   "files": {
     "global.db": {
       "size": 562991104,
@@ -192,7 +192,7 @@ Exemplu raport:
 # PANIC MODE REPORT
 
 **Generated**: 2026-02-07 23:47:25
-**Backup Location**: `/tmp/claude_PANIC_20260207_234649`
+**Backup Location**: `/tmp/ean_PANIC_20260207_234649`
 
 ## Summary
 
@@ -295,13 +295,13 @@ Dacă `--fix` strica ceva (foarte rar):
 
 ```bash
 # 1. Găsește backup-ul
-ls -lth /tmp/claude_PANIC_*/
+ls -lth /tmp/ean_PANIC_*/
 
 # 2. Stop daemon
 pkill -f memory_daemon.py
 
 # 3. Restore DB
-BACKUP_DIR="/tmp/claude_PANIC_20260207_234649"
+BACKUP_DIR="/tmp/ean_PANIC_20260207_234649"
 cp $BACKUP_DIR/global.db ./global.db
 cp $BACKUP_DIR/global.db-wal ./global.db-wal  # dacă există
 cp $BACKUP_DIR/global.db-shm ./global.db-shm  # dacă există
@@ -387,7 +387,7 @@ MEMORY_PANIC_ALLOW_FIX=1 mem panic panic --fix --dry-run
 **Soluție**:
 ```bash
 # Curățare backups vechi din /tmp
-find /tmp -type d -name "claude_PANIC_*" -mtime +7 -exec rm -rf {} \;
+find /tmp -type d -name "ean_PANIC_*" -mtime +7 -exec rm -rf {} \;
 
 # Sau modifică PANIC_DIR_BASE în mem_panic.py
 PANIC_DIR_BASE = Path("/mnt/backup")  # Alt disk

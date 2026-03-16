@@ -1,6 +1,6 @@
 # Event Specification v1.0
 
-This document defines the official event taxonomy for the Agent Event Stream in Universal Agent Memory.
+This document defines the official event taxonomy for the Agent Event Stream in EAN AgentOS.
 
 ---
 

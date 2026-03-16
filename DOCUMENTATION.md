@@ -1,4 +1,4 @@
-# Sistem de Memorie Permanentă pentru Claude Code
+# EAN AgentOS — Documentație Completă
 
 ## Documentație Completă v1.0
 

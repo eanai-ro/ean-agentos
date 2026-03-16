@@ -1,4 +1,4 @@
-# Ghid de Utilizare - Memorie Permanentă Claude Code
+# EAN AgentOS — Ghid de Utilizare
 
 ## 🚀 Quick Start
 

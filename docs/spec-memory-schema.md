@@ -1,6 +1,6 @@
 # Memory Schema Specification v1.0
 
-This document defines the official schema for all memory entities in Universal Agent Memory.
+This document defines the official schema for all memory entities in EAN AgentOS.
 
 ---
 

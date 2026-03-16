@@ -1,8 +1,8 @@
-# Universal Agent Memory
+# EAN AgentOS
 
 ## Ce este?
 
-Universal Agent Memory este un sistem de memorie persistentă pentru agenți AI de coding. Dă agenților (Claude Code, Gemini CLI, Codex CLI și alții) capacitatea de a **reține și partaja cunoștințe între sesiuni**.
+EAN AgentOS este un sistem de memorie persistentă pentru agenți AI de coding. Dă agenților (Claude Code, Gemini CLI, Codex CLI și alții) capacitatea de a **reține și partaja cunoștințe între sesiuni**.
 
 ## Problema
 

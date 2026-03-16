@@ -1,4 +1,4 @@
-# MODEL DE DATE — Universal Agent Memory
+# MODEL DE DATE — EAN AgentOS
 
 **Ultima actualizare:** 2026-03-15
 

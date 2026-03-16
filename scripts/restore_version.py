@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Restaurare versiuni de fișiere din memoria permanentă Claude Code.
+Restaurare versiuni de fișiere din EAN AgentOS.
 
 Permite:
 - Listarea versiunilor disponibile pentru un fișier

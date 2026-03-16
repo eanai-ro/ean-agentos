@@ -1,6 +1,6 @@
 # Kimi Memory - Adaptare Memorie Permanentă pentru Kimi Code CLI
 
-Acest pachet adaptează sistemul tău de memorie permanentă (creat pentru Claude Code) pentru **Kimi Code CLI**.
+Acest pachet adaptează EAN AgentOS pentru **Kimi Code CLI**.
 
 ## 🎯 Arhitectura
 

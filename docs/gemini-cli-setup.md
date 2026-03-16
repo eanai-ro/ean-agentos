@@ -1,11 +1,11 @@
 # Gemini CLI — Setup Guide
 
-Conectează Gemini CLI la Universal Agent Memory pentru a avea memorie persistentă între sesiuni.
+Conectează Gemini CLI la EAN AgentOS pentru a avea memorie persistentă între sesiuni.
 
 ## Cerințe
 
 - Python 3.10+
-- Universal Agent Memory server pornit (`python3 scripts/web_server.py`)
+- EAN AgentOS server pornit (`python3 scripts/web_server.py`)
 - Gemini CLI instalat
 
 ## Setup rapid

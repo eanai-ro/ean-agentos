@@ -1,12 +1,12 @@
 # Adapter Specification v1.0
 
-This document defines the contract for building adapters that connect AI CLI tools to Universal Agent Memory.
+This document defines the contract for building adapters that connect AI CLI tools to EAN AgentOS.
 
 ---
 
 ## What is an Adapter?
 
-An adapter is a thin client that translates a specific AI tool's workflow into Universal Agent Memory API calls. It handles:
+An adapter is a thin client that translates a specific AI tool's workflow into EAN AgentOS API calls. It handles:
 
 1. **Metadata injection** — automatically attaches cli_name, agent_name, provider, model_name, session_id, project_path to every request
 2. **Session management** — generates and tracks session IDs

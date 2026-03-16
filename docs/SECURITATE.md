@@ -1,4 +1,4 @@
-# SECURITATE — Universal Agent Memory
+# SECURITATE — EAN AgentOS
 
 **Ultima actualizare:** 2026-03-15
 **Nivel expunere:** INTERNAL_ONLY
@@ -7,7 +7,7 @@
 
 ## 1. Profil de Securitate
 
-Universal Agent Memory este un **tool local/LAN** pentru dezvoltatori. Nu este expus public.
+EAN AgentOS este un **tool local/LAN** pentru dezvoltatori. Nu este expus public.
 
 | Aspect | Status |
 |--------|--------|

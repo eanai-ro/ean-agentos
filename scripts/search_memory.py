@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Căutare în memoria permanentă Claude Code.
+Căutare în EAN AgentOS.
 
 Permite căutare în:
 - Mesaje (conversații)
@@ -294,7 +294,7 @@ def get_stats(db_path: Path = None, label: str = ""):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Căutare în memoria permanentă Claude Code"
+        description="Căutare în EAN AgentOS"
     )
     parser.add_argument("query", nargs="?", help="Text de căutat")
     parser.add_argument("--messages", "-m", action="store_true",

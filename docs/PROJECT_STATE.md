@@ -1,4 +1,4 @@
-# PROJECT_STATE — Universal Agent Memory (ean-agentos)
+# PROJECT_STATE — EAN AgentOS
 
 **Versiune curentă:** v1.3
 **Ultima actualizare:** 2026-03-15

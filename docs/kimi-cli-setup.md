@@ -1,11 +1,11 @@
 # Kimi CLI — Setup Guide
 
-Conectează Kimi CLI (Moonshot AI) la Universal Agent Memory pentru memorie persistentă între sesiuni.
+Conectează Kimi CLI (Moonshot AI) la EAN AgentOS pentru memorie persistentă între sesiuni.
 
 ## Cerințe
 
 - Python 3.10+
-- Universal Agent Memory server pornit (`python3 scripts/web_server.py`)
+- EAN AgentOS server pornit (`python3 scripts/web_server.py`)
 - Kimi CLI instalat (`pip install kimi-cli` sau conform [documentației oficiale](https://github.com/MoonshotAI/kimi-cli))
 
 ## Setup rapid (MCP — recomandat)

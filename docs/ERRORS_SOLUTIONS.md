@@ -1,4 +1,4 @@
-# ERRORS_SOLUTIONS — Universal Agent Memory (ean-agentos)
+# ERRORS_SOLUTIONS — EAN AgentOS (ean-agentos)
 
 Jurnal de erori întâlnite și soluțiile lor.
 

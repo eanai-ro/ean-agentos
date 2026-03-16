@@ -1,6 +1,6 @@
 # MCP Bridge — Model Context Protocol
 
-Universal Agent Memory expune un server MCP (Model Context Protocol) care permite oricărui agent AI compatibil să acceseze memoria persistentă prin protocol standardizat.
+EAN AgentOS expune un server MCP (Model Context Protocol) care permite oricărui agent AI compatibil să acceseze memoria persistentă prin protocol standardizat.
 
 ## Ce este MCP?
 

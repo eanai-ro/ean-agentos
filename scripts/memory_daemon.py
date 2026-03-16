@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Memory Daemon pentru Claude Code - Salvează TOTUL în EAN AgentOS persistent memory.
+Memory Daemon — EAN AgentOS persistent memory capture.
 
 Acest script este apelat de hooks-urile Claude Code pentru:
 - SessionStart: Începe o sesiune nouă

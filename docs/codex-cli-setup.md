@@ -1,11 +1,11 @@
 # Codex CLI — Setup Guide
 
-Conectează Codex CLI (OpenAI) la Universal Agent Memory pentru memorie persistentă între sesiuni.
+Conectează Codex CLI (OpenAI) la EAN AgentOS pentru memorie persistentă între sesiuni.
 
 ## Cerințe
 
 - Python 3.10+
-- Universal Agent Memory server pornit (`python3 scripts/web_server.py`)
+- EAN AgentOS server pornit (`python3 scripts/web_server.py`)
 - Codex CLI instalat
 
 ## Setup rapid

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-VECTOR SEARCH - Căutare semantică în memoria permanentă Claude Code.
+VECTOR SEARCH - Căutare semantică în EAN AgentOS.
 
 Folosește Chroma DB și SentenceTransformers pentru căutare semantică.
 
@@ -456,7 +456,7 @@ def print_results(results: List[Dict], query: str):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Căutare semantică în memoria permanentă Claude Code"
+        description="Căutare semantică în EAN AgentOS"
     )
     parser.add_argument("query", nargs="?", help="Text de căutat")
     parser.add_argument("--limit", "-l", type=int, default=10,

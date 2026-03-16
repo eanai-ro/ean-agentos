@@ -1,4 +1,4 @@
-# Implementare P1 - Memorie Permanentă Claude Code
+# Implementare P1 - EAN AgentOS
 
 **Data:** 2026-02-07  
 **Status:** ✅ COMPLET

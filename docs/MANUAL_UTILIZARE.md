@@ -1,4 +1,4 @@
-# MANUAL DE UTILIZARE — Universal Agent Memory
+# MANUAL DE UTILIZARE — EAN AgentOS
 
 **Versiune:** v1.3
 **Data:** 2026-03-15

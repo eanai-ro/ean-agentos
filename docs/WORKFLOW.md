@@ -1,4 +1,4 @@
-# WORKFLOW — Universal Agent Memory
+# WORKFLOW — EAN AgentOS
 
 **Ultima actualizare:** 2026-03-15
 

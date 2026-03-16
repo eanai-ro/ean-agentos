@@ -1,4 +1,4 @@
-# STRUCTURA DOCUMENTAȚIEI — Universal Agent Memory
+# STRUCTURA DOCUMENTAȚIEI — EAN AgentOS
 
 **Ultima actualizare:** 2026-03-15
 

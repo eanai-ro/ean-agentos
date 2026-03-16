@@ -2,7 +2,7 @@
 
 ## Overview
 
-Universal Agent Memory is a structured, persistent memory system for AI coding agents. It stores knowledge as typed entities (decisions, facts, goals, tasks, error resolutions) in a SQLite database and exposes them through CLI, REST API, and web dashboard.
+EAN AgentOS is a structured, persistent memory system for AI coding agents. It stores knowledge as typed entities (decisions, facts, goals, tasks, error resolutions) in a SQLite database and exposes them through CLI, REST API, and web dashboard.
 
 ## System Layers
 

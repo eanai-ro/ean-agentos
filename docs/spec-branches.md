@@ -1,6 +1,6 @@
 # Branch Specification v1.0
 
-This document defines the memory branching model in Universal Agent Memory.
+This document defines the memory branching model in EAN AgentOS.
 
 ---
 

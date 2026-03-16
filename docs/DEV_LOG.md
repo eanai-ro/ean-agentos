@@ -1,4 +1,4 @@
-# DEV_LOG — Universal Agent Memory (ean-agentos)
+# DEV_LOG — EAN AgentOS (ean-agentos)
 
 Jurnal de dezvoltare cu toate modificările semnificative.
 

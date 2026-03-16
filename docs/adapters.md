@@ -1,6 +1,6 @@
 # Writing Adapters
 
-Adapters connect AI CLI tools to Universal Agent Memory. An adapter translates between the tool's hook/plugin system and the memory API.
+Adapters connect AI CLI tools to EAN AgentOS. An adapter translates between the tool's hook/plugin system and the memory API.
 
 ## How Adapters Work
 

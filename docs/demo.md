@@ -1,6 +1,6 @@
 # Demo Walkthrough
 
-A complete end-to-end demonstration of Universal Agent Memory.
+A complete end-to-end demonstration of EAN AgentOS.
 
 ---
 

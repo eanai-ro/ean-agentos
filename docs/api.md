@@ -1,6 +1,6 @@
 # API Reference
 
-Universal Agent Memory exposes two API layers: the **Universal API** for agent communication and the **Dashboard API** for UI and management.
+EAN AgentOS exposes two API layers: the **Universal API** for agent communication and the **Dashboard API** for UI and management.
 
 Default server: `http://localhost:19876`
 

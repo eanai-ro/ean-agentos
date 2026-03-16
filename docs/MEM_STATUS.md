@@ -2,7 +2,7 @@
 
 ## Descriere
 
-`mem status` este dashboard-ul de observabilitate pentru memoria permanentă Claude Code. Oferă o vizualizare **one-screen** a stării generale a sistemului + activitatea ultimelor 24 de ore.
+`mem status` este dashboard-ul de observabilitate pentru EAN AgentOS. Oferă o vizualizare **one-screen** a stării generale a sistemului + activitatea ultimelor 24 de ore.
 
 ## Filozofie: Single Pane of Glass
 

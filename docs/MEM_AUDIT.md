@@ -51,7 +51,7 @@ mem audit tail -n 100 --json | jq '.events[0]'
    ID Timestamp            Action               Table                Sev    Actor           Summary
 --------------------------------------------------------------------------------------------------------------------
   158 2026-02-08 01:05:23  panic_scan           system               🟠     mem_panic       Scan complete: 426 hits detected
-  157 2026-02-08 01:05:18  panic_backup         system               🟠     mem_panic       Emergency backup created: claude_PANIC_
+  157 2026-02-08 01:05:18  panic_backup         system               🟠     mem_panic       Emergency backup created: ean_PANIC_
   156 2026-02-08 01:05:15  panic_freeze         system               🔴     mem_panic       Panic mode activated - freeze initiated
   155 2026-02-08 00:58:12  scrub                messages             ℹ️     scrubbing       Scrubbed 3 secrets: bearer_token: 2, ope
   154 2026-02-08 00:45:30  quarantine           quarantine           ⚠️     guard           Blocked user_prompt: 2 hits detected
@@ -94,7 +94,7 @@ mem audit search panic --json | jq '.count'
    ID Timestamp            Action               Table                Sev    Actor           Summary
 --------------------------------------------------------------------------------------------------------------------
   158 2026-02-08 01:05:23  panic_scan           system               🟠     mem_panic       Scan complete: 426 hits detected
-  157 2026-02-08 01:05:18  panic_backup         system               🟠     mem_panic       Emergency backup created: claude_PANIC_
+  157 2026-02-08 01:05:18  panic_backup         system               🟠     mem_panic       Emergency backup created: ean_PANIC_
   156 2026-02-08 01:05:15  panic_freeze         system               🔴     mem_panic       Panic mode activated - freeze initiated
 
 Total: 3 results
