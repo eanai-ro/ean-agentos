@@ -210,25 +210,47 @@ ean-agentos/
 
 ---
 
-## EAN AgentOS Pro 🔒
+## Free vs Pro — What You Get
 
-The Pro version adds **multi-agent orchestration** — coordinating multiple AI CLIs on the same project:
+### Free (this repo) — Full persistent memory system
 
-| Pro Feature | Description |
-|------------|-------------|
-| 🤖 **Multi-Agent Orchestration** | Projects with tasks, lease-based ownership |
-| 🗣️ **AI Deliberation** | Structured multi-round sessions with synthesis |
-| 🚀 **CLI Launcher** | Programmatically launch Claude/Gemini/Codex/Kimi |
-| 🔄 **Auto-Pipeline** | Task chaining, auto-review, conflict resolution |
-| 🧠 **Intelligence Layer** | Capability scoring, weighted voting, skill learning |
-| 📼 **Replay System** | Complete project + deliberation timelines |
-| 📋 **Peer Review** | Formal verdicts, auto-fix |
+| Feature | Included |
+|---------|----------|
+| ✅ Persistent memory (decisions, facts, goals, tasks, errors) | **Yes** |
+| ✅ `mem suggest` — find past solutions instantly | **Yes** |
+| ✅ Knowledge extraction with pattern detection | **Yes** |
+| ✅ Experience graph (problem → solution → outcome) | **Yes** |
+| ✅ Context builder (compact/full/survival) | **Yes** |
+| ✅ Cognitive search across all memory | **Yes** |
+| ✅ Cross-agent learning | **Yes** |
+| ✅ Branch-aware memory | **Yes** |
+| ✅ Backup & recovery | **Yes** |
+| ✅ Web dashboard | **Yes** |
+| ✅ MCP server (Claude Code integration) | **Yes** |
+| ✅ CLI tool (`mem`) with 30+ commands | **Yes** |
+| ✅ Hooks for Claude Code, Gemini CLI, Codex CLI, Kimi CLI | **Yes** |
+| ✅ 49 database tables, 57 tests | **Yes** |
 
-**Details**: [ean@eanai.ro](mailto:ean@eanai.ro)
+### Pro 🔒 — Adds multi-agent orchestration
+
+| Feature | Free | Pro |
+|---------|------|-----|
+| Multi-agent orchestration (projects, tasks, leases) | — | ✅ |
+| AI deliberation (multi-round, voting, synthesis) | — | ✅ |
+| CLI Launcher (launch Claude/Gemini/Codex/Kimi programmatically) | — | ✅ |
+| Auto-pipeline (task chaining, auto-review, conflict resolution) | — | ✅ |
+| Intelligence layer (capability scoring, weighted voting) | — | ✅ |
+| Skill learning (learns from reviews) | — | ✅ |
+| Replay system (project + deliberation timelines) | — | ✅ |
+| Peer review workflow (formal verdicts, auto-fix) | — | ✅ |
+
+> **Note:** Some orchestration files in this repo (e.g. `orchestrator.py`, `deliberation.py`) are compatibility stubs that return upgrade guidance. They exist so the system doesn't crash if Pro features are referenced. The executable multi-agent orchestration code is in Pro only.
+
+**Contact for Pro**: [ean@eanai.ro](mailto:ean@eanai.ro)
 
 ---
 
-## Live Demos
+## Live Demos (Pro)
 
 Real output from multi-agent orchestration sessions — [see all demos](demos/README.md):
 

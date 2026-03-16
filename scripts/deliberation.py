@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
-"""EAN AgentOS Pro feature. Upgrade at: mailto:ean@eanai.ro"""
+"""
+EAN AgentOS Pro feature (compatibility stub)
 
-_MSG = "\n  ⚠️  This feature requires EAN AgentOS Pro.\n  Upgrade at: mailto:ean@eanai.ro\n"
+This file is a STUB in the free/open-source version.
+It provides compatibility so other components don't crash.
+The executable code is available in EAN AgentOS Pro.
+
+Contact for Pro: ean@eanai.ro
+"""
+
+_MSG = "\n  ⚠️  This feature requires EAN AgentOS Pro.\n  This is a compatibility stub in the free version.\n  Contact: ean@eanai.ro\n"
 
 def _pro(*args, **kwargs):
     print(_MSG)
-    return {"error": "Requires EAN AgentOS Pro"}
+    return {"error": "Requires EAN AgentOS Pro (compatibility stub)"}
 
-# Stub classes/functions
 class DeliberationEngine:
     def create_session(self, *a, **kw): return _pro()
     def submit_proposal(self, *a, **kw): return _pro()
@@ -22,7 +29,6 @@ class Synthesizer:
     def build_synthesis(self, *a, **kw): return _pro()
 
 SESSION_TYPES = {}
-
 find_cli = _pro
 launch_for_task = _pro
 launch_for_deliberation = _pro

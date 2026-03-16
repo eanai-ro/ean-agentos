@@ -1,6 +1,6 @@
-# EAN AgentOS — Demo Gallery
+# EAN AgentOS — Demo Gallery (Pro Edition)
 
-Real outputs from live multi-agent orchestration sessions.
+Real outputs from live multi-agent orchestration sessions. These demos show **Pro features** — the free version includes persistent memory, `mem suggest`, knowledge extraction, and more (see [README](../README.md)).
 
 ## Available Demos
 
