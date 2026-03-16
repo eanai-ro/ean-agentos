@@ -102,6 +102,55 @@
 
 ---
 
+## Demo 4: Security Audit — Real Vulnerable Code
+
+> All 3 agents audit the same Flask login endpoint with SQL injection, plaintext passwords, and weak JWT.
+
+```python
+# The vulnerable code:
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = db.query("SELECT * FROM users WHERE email='" + data['email']
+                    + "' AND password='" + data['password'] + "'")
+    if user:
+        token = jwt.encode({'user_id': user.id,
+                'exp': datetime.utcnow() + timedelta(days=365)}, 'secret123')
+        return jsonify({'token': token})
+```
+
+```
+🔍 gemini-cli:
+   1. SQL Injection (CRITICAL) — concatenates user input into raw SQL.
+      Attacker sends: ' OR '1'='1 → bypasses authentication entirely.
+   2. Plain-Text Password Comparison — passwords stored/compared as
+      plaintext. Must use bcrypt or argon2 hashing.
+   3. Weak JWT — hardcoded secret 'secret123', 365-day expiry.
+
+🔍 kimi-cli:
+   1. SQL Injection (CRITICAL) — attacker injects via email/password
+      fields to bypass auth or exfiltrate entire database.
+      Fix: parameterized queries or ORM.
+   2. Passwords handled as plaintext — no hashing, no salting.
+      Fix: bcrypt with salt rounds.
+   3. Weak JWT secret + excessive token lifetime (365 days).
+      Fix: strong random secret + short expiry + refresh tokens.
+
+🔍 codex-cli:
+   1. SQL injection — user input concatenated into SQL. Replace with
+      parameterized queries so input is never interpreted as SQL.
+   2. Passwords as plaintext — must hash with bcrypt/argon2 before
+      storage, compare hashes on login.
+   3. JWT hardcoded secret 'secret123' + 1-year expiry. Use
+      env-stored secret + 15-minute access tokens + refresh flow.
+
+🚨 CONSENSUS: All 3 found same 3 critical vulnerabilities
+   Severity: CRITICAL — block deployment
+   Fixes: parameterized SQL + password hashing + JWT hardening
+```
+
+---
+
 ## What these demos show
 
 | Demo | What it proves |
