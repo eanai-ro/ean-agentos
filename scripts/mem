@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-mem - CLI unificat pentru memoria permanentă Claude Code
+mem - CLI unificat pentru EAN AgentOS
 Utilizare: mem <command> [args]
 """
 
@@ -40,7 +40,7 @@ def get_db():
 def cmd_help():
     """Afișează help."""
     print("""
-mem - CLI pentru memoria permanentă Claude Code
+mem - CLI pentru EAN AgentOS
 ================================================
 
 Comenzi disponibile:

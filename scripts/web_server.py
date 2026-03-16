@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-WEB SERVER - Server Flask pentru vizualizare memorie Claude.
+WEB SERVER - Server Flask pentru vizualizare EAN AgentOS.
 
 Oferă interfață web pentru explorarea memoriei permanente.
 Rulează pe portul 19876 (implicit).
@@ -519,7 +519,7 @@ def api_errors():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Server web pentru vizualizare memorie Claude"
+        description="Server web pentru vizualizare EAN AgentOS"
     )
     parser.add_argument("--host", "-H", type=str, default="192.168.205.222",
                         help="Host (default: 192.168.205.222)")

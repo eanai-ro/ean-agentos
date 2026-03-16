@@ -141,7 +141,7 @@ def generate_markdown(session, messages, tool_calls) -> str:
 
     # Header
     project_name = Path(session['project_path']).name if session['project_path'] else "Unknown"
-    lines.append(f"# Sesiune Claude Code")
+    lines.append(f"# Sesiune agent")
     lines.append("")
     lines.append(f"**Proiect:** {project_name}")
     lines.append(f"**Cale:** `{session['project_path'] or 'N/A'}`")
