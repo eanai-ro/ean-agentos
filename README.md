@@ -15,14 +15,33 @@
 
 Your AI agent forgets everything between sessions. EAN AgentOS gives it permanent memory.
 
-```
-Session 1:
-  > CORS error in Flask
-  > Fixed: pip install flask-cors + CORS(app)
+### Demo: "Never solve the same bug twice"
 
-Session 2 (3 months later):
-  > Same CORS error
-  > AgentOS: "You solved this on March 12. Solution: flask-cors middleware"
+```bash
+# Session 1: You fix a CORS error
+#   Agent saves: error + solution + context
+
+# Session 2 (3 months later): Same CORS error appears
+$ mem suggest "CORS error"
+
+💡 SOLUTIONS FOR: CORS error
+══════════════════════════════════════════════════════════════
+
+  1. [92pts] ✅ CORS error: blocked by CORS policy
+     Solution: Add flask-cors middleware and configure CORS(app)
+     Code:     pip install flask-cors && CORS(app)
+     Match: 100% | Confidence: 92% | Agent: claude-code
+
+# You also forgot how you fixed Docker permissions last month?
+$ mem suggest "docker permission denied"
+
+💡 SOLUTIONS FOR: docker permission denied
+══════════════════════════════════════════════════════════════
+
+  1. [87pts] ✅ docker.sock permission denied
+     Solution: Add user to docker group and restart session
+     Code:     sudo usermod -aG docker $USER && newgrp docker
+     Match: 100% | Confidence: 87% | Agent: kimi-cli
 ```
 
 **Works with Claude Code, Gemini CLI, Codex CLI, and Kimi CLI.** All agents share the same memory.
