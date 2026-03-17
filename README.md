@@ -65,6 +65,19 @@ $ mem suggest "docker permission denied"
 
 ---
 
+## Prerequisites
+
+**You need at least one AI coding CLI installed first:**
+
+| CLI | Install | Required? |
+|-----|---------|-----------|
+| [Claude Code](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` | At least one |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `npm install -g @anthropic-ai/gemini-cli` | At least one |
+| [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | At least one |
+| [Kimi CLI](https://github.com/MoonshotAI/kimi-cli) | `pip install kimi-cli` | At least one |
+
+> **Without a CLI, EAN AgentOS has nothing to capture.** Install at least one, then proceed:
+
 ## Quick Install
 
 ```bash

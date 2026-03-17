@@ -2,6 +2,23 @@
 
 Get started in 60 seconds.
 
+## Step 0: Prerequisites
+
+**Install at least one AI coding CLI first:**
+
+```bash
+# Claude Code (recommended)
+npm install -g @anthropic-ai/claude-code
+
+# Or Gemini CLI
+npm install -g @anthropic-ai/gemini-cli
+
+# Or Codex CLI
+npm install -g @openai/codex
+```
+
+Without a CLI, EAN AgentOS has nothing to capture. Install one, then:
+
 ## Step 1: Install
 
 ```bash
