@@ -1012,6 +1012,29 @@ def ensure_reviews_table(conn):
         print("✓ Reviews table created/verified (18H)")
 
 
+def ensure_cli_agent_columns(conn):
+    """Migration 020: Adaugă cli_name și agent_name la messages și sessions."""
+    cur = conn.cursor()
+    tables_cols = {
+        "messages": [("cli_name", "TEXT"), ("agent_name", "TEXT")],
+        "sessions": [("cli_name", "TEXT"), ("agent_name", "TEXT")],
+    }
+    for table, cols in tables_cols.items():
+        for col, col_type in cols:
+            try:
+                cur.execute(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}")
+            except sqlite3.OperationalError:
+                pass  # Column already exists
+    # Indexes
+    try:
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_messages_cli ON messages(cli_name)")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_sessions_cli ON sessions(cli_name)")
+    except sqlite3.OperationalError:
+        pass
+    conn.commit()
+    print("✓ CLI/Agent columns added (020)")
+
+
 def init_database(db_path: Path) -> bool:
     """Inițializează baza de date cu schema completă."""
     try:
@@ -1085,6 +1108,9 @@ def init_database(db_path: Path) -> bool:
 
         # V20: Skill Learning
         ensure_skill_observations_table(conn)
+
+        # Migration 020: CLI/Agent tracking columns
+        ensure_cli_agent_columns(conn)
 
         conn.close()
         return True

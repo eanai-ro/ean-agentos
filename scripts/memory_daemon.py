@@ -55,6 +55,52 @@ PROJECT_MEMORY_DIR = ".ean-agentos-memory"
 PROJECT_DB_NAME = "project.db"
 
 
+def detect_cli_name() -> str:
+    """Detectează care CLI rulează pe baza variabilelor de mediu și proceselor."""
+    # 1. Variabilă de mediu explicită (setată de hooks/adapters)
+    env_cli = os.environ.get("MEMORY_CLI_NAME") or os.environ.get("MEMORY_AGENT_NAME")
+    if env_cli:
+        return env_cli
+
+    # 2. Detectare din procesul părinte sau environment
+    ppid_cmd = ""
+    try:
+        import subprocess
+        ppid = os.getppid()
+        result = subprocess.run(["ps", "-p", str(ppid), "-o", "comm="],
+                                capture_output=True, text=True, timeout=2)
+        ppid_cmd = result.stdout.strip().lower()
+    except Exception:
+        pass
+
+    if "claude" in ppid_cmd:
+        return "claude-code"
+    if "gemini" in ppid_cmd:
+        return "gemini-cli"
+    if "codex" in ppid_cmd:
+        return "codex-cli"
+    if "kimi" in ppid_cmd:
+        return "kimi-cli"
+
+    # 3. Detectare din hooks config path
+    script_caller = os.environ.get("_", "")
+    if "claude" in script_caller.lower():
+        return "claude-code"
+    if "gemini" in script_caller.lower():
+        return "gemini-cli"
+
+    # 4. Default — verifică ce config-uri există
+    if Path.home().joinpath(".claude").exists():
+        return "claude-code"
+
+    return "unknown"
+
+
+def detect_agent_name() -> str:
+    """Detectează numele agentului (poate fi diferit de CLI)."""
+    return os.environ.get("MEMORY_AGENT_NAME", detect_cli_name())
+
+
 def get_project_db_path() -> Optional[Path]:
     """Găsește DB-ul specific proiectului dacă există."""
     cwd = Path.cwd()
@@ -624,9 +670,11 @@ def save_assistant_responses_to_db(responses: list, session_id: str):
 
     # Filtrează răspunsurile noi
     project_path = get_project_path()
+    _cli = detect_cli_name()
+    _agent = detect_agent_name()
     new_responses = [
         (session_id, 'assistant', resp['text'], resp.get('uuid', 'response'),
-         project_path, resp.get('timestamp', datetime.now().isoformat()))
+         project_path, resp.get('timestamp', datetime.now().isoformat()), _cli, _agent)
         for resp in responses
         if resp.get('uuid', '') not in existing_uuids
     ]
@@ -635,8 +683,8 @@ def save_assistant_responses_to_db(responses: list, session_id: str):
     if new_responses:
         cursor.executemany("""
             INSERT INTO messages
-            (session_id, role, content, message_type, project_path, timestamp)
-            VALUES (?, ?, ?, ?, ?, ?)
+            (session_id, role, content, message_type, project_path, timestamp, cli_name, agent_name)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, new_responses)
 
     conn.commit()
@@ -1218,10 +1266,12 @@ def handle_session_start(data: Optional[Dict] = None):
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    cli_name = detect_cli_name()
+    agent_name = detect_agent_name()
     cursor.execute("""
-        INSERT INTO sessions (session_id, project_path, started_at)
-        VALUES (?, ?, ?)
-    """, (session_id, project_path, datetime.now().isoformat()))
+        INSERT INTO sessions (session_id, project_path, started_at, cli_name, agent_name)
+        VALUES (?, ?, ?, ?, ?)
+    """, (session_id, project_path, datetime.now().isoformat(), cli_name, agent_name))
 
     conn.commit()
     conn.close()
@@ -1719,14 +1769,16 @@ def handle_user_prompt(data: Optional[Dict] = None):
 
     cursor.execute("""
         INSERT INTO messages
-        (session_id, role, content, message_type, project_path)
-        VALUES (?, ?, ?, ?, ?)
+        (session_id, role, content, message_type, project_path, cli_name, agent_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     """, (
         session_id,
         'user',
-        prompt_scrubbed,  # <-- SCRUBBED
+        prompt_scrubbed,
         'prompt',
-        get_project_path()
+        get_project_path(),
+        detect_cli_name(),
+        detect_agent_name(),
     ))
 
     conn.commit()
@@ -1796,14 +1848,16 @@ def handle_assistant_response(data: Optional[Dict] = None):
 
     cursor.execute("""
         INSERT INTO messages
-        (session_id, role, content, message_type, project_path)
-        VALUES (?, ?, ?, ?, ?)
+        (session_id, role, content, message_type, project_path, cli_name, agent_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
     """, (
         session_id,
         'assistant',
-        response_scrubbed,  # <-- SCRUBBED
+        response_scrubbed,
         'response',
-        get_project_path()
+        get_project_path(),
+        detect_cli_name(),
+        detect_agent_name(),
     ))
 
     conn.commit()
