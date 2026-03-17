@@ -71,7 +71,7 @@ def is_panic_mode() -> bool:
     try:
         state = json.loads(PANIC_MODE_FILE.read_text())
         return state.get("enabled", False)
-    except:
+    except Exception:
         return False
 
 def get_panic_status() -> Dict:
@@ -81,7 +81,7 @@ def get_panic_status() -> Dict:
 
     try:
         return json.loads(PANIC_MODE_FILE.read_text())
-    except:
+    except Exception:
         return {"enabled": False, "timestamp": None, "reason": None}
 
 def panic_backup() -> Path:

@@ -160,7 +160,7 @@ def load_whitelist():
         return []
     try:
         return [line.strip() for line in SCRUB_WHITELIST_FILE.read_text().splitlines() if line.strip()]
-    except:
+    except Exception:
         return []
 
 # === AUDIT LOGGING & DETECTION EVENTS ===
@@ -207,7 +207,7 @@ def get_rule_weight(pattern_id: str) -> int:
             return result[0]
         else:
             return 50  # Default weight dacă pattern_id nu există
-    except:
+    except Exception:
         return 50
 
 def calculate_score(pattern_id: str, confidence: str) -> int:
@@ -482,7 +482,7 @@ def update_guard_state(severity: str):
     if GUARD_STATE_FILE.exists():
         try:
             state = json.loads(GUARD_STATE_FILE.read_text())
-        except:
+        except Exception:
             state = {}
     else:
         state = {}
@@ -589,7 +589,7 @@ def find_session_transcript(session_id: str) -> Optional[Path]:
                                 data = json.loads(line)
                                 if data.get('sessionId') == session_id:
                                     return jsonl_file
-                except:
+                except Exception:
                     continue
 
     # Strategie 3: Fallback - cel mai recent fișier din proiectul curent
@@ -1067,7 +1067,7 @@ def send_telegram_preclear_alert(hint: Dict[str, Any]) -> bool:
             try:
                 state = json.loads(TG_ALERT_STATE_FILE.read_text())
                 last_alert_time = state.get("last_preclear_alert", 0)
-            except:
+            except Exception:
                 pass
 
         now = time.time()

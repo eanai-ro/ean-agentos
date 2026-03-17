@@ -53,7 +53,7 @@ def format_age(timestamp_str):
             return f"{delta.seconds // 60}m ago"
         else:
             return f"{delta.seconds}s ago"
-    except:
+    except Exception:
         return "N/A"
 
 def get_general_stats(conn):
@@ -120,7 +120,7 @@ def get_last_24h_stats(conn):
 
         cursor.execute("SELECT COUNT(*) FROM detection_events WHERE ts >= ? AND decision='quarantine'", (cutoff,))
         stats['quarantined_24h'] = cursor.fetchone()[0]
-    except:
+    except Exception:
         stats['detections_24h'] = 0
         stats['quarantined_24h'] = 0
 
@@ -128,7 +128,7 @@ def get_last_24h_stats(conn):
     try:
         cursor.execute("SELECT COUNT(*) FROM audit_log WHERE ts >= ?", (cutoff,))
         stats['audit_events_24h'] = cursor.fetchone()[0]
-    except:
+    except Exception:
         stats['audit_events_24h'] = 0
 
     return stats
@@ -216,7 +216,7 @@ def get_compact_stats(conn):
         else:
             stats['last_compact_time'] = None
             stats['last_compact_age'] = "Never"
-    except:
+    except Exception:
         stats['last_compact_time'] = None
         stats['last_compact_age'] = "Never"
 

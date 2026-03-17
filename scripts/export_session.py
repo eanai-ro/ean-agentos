@@ -251,7 +251,7 @@ def generate_markdown(session, messages, tool_calls) -> str:
                     lines.append(input_str)
                     lines.append("```")
 
-            except:
+            except Exception:
                 if tc['tool_input']:
                     lines.append(f"Input: {tc['tool_input'][:200]}...")
 

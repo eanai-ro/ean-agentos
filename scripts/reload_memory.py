@@ -136,7 +136,7 @@ def reload_context(full=False, project_filter=None, days=7):
             cmd = json.loads(tool_input).get('command', '')[:100]
             status = "✅" if exit_code == 0 else "❌"
             print(f"  {status} {cmd}")
-        except:
+        except Exception:
             pass
 
     # 6. FIȘIERE MODIFICATE RECENT

@@ -27,7 +27,7 @@ def format_timestamp(ts_str):
     try:
         ts = datetime.fromisoformat(ts_str)
         return ts.strftime("%Y-%m-%d %H:%M:%S")
-    except:
+    except Exception:
         return ts_str[:19]  # Truncate la YYYY-MM-DD HH:MM:SS
 
 def severity_emoji(severity):
