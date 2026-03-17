@@ -224,24 +224,59 @@ echo ""
 # ================================================================
 # START MEMORY SERVER (background)
 # ================================================================
-echo -e "${CYAN}━━━ Step 6: Start Memory Server ━━━${NC}"
+echo -e "${CYAN}━━━ Step 6: Start Memory Server + Autostart ━━━${NC}"
 
 cd "$PROJECT_ROOT"
-# Start server in background if not already running
+
+# Create autostart script
+cat > "$PROJECT_ROOT/start_server.sh" << SRVEOF
+#!/bin/bash
+# EAN AgentOS — Memory Server Autostart
+cd "$PROJECT_ROOT"
+if ! curl -s http://localhost:19876/ > /dev/null 2>&1; then
+    nohup python3 scripts/web_server.py --host 127.0.0.1 --port 19876 > /dev/null 2>&1 &
+fi
+SRVEOF
+chmod +x "$PROJECT_ROOT/start_server.sh"
+
+# Start server now
 if command -v python3 &>/dev/null; then
-    # Check if server is already running
     if curl -s http://localhost:19876/ > /dev/null 2>&1; then
         echo -e "  ${GREEN}✓${NC} Memory server already running on port 19876"
     else
-        nohup python3 scripts/web_server.py --host 127.0.0.1 --port 19876 > /dev/null 2>&1 &
+        bash "$PROJECT_ROOT/start_server.sh"
         sleep 2
         if curl -s http://localhost:19876/ > /dev/null 2>&1; then
             echo -e "  ${GREEN}✓${NC} Memory server started (port 19876)"
         else
-            echo -e "  ${YELLOW}⚠${NC} Memory server: start manually with: python3 scripts/web_server.py"
+            echo -e "  ${YELLOW}⚠${NC} Memory server: start manually with: ./start_server.sh"
         fi
     fi
 fi
+
+# Setup autostart (bashrc / profile)
+AUTOSTART_LINE="# EAN AgentOS autostart"
+AUTOSTART_CMD="[ -f \"$PROJECT_ROOT/start_server.sh\" ] && bash \"$PROJECT_ROOT/start_server.sh\""
+
+# Add to .bashrc if not already there
+if [ -f "$HOME/.bashrc" ]; then
+    if ! grep -q "EAN AgentOS autostart" "$HOME/.bashrc" 2>/dev/null; then
+        echo "" >> "$HOME/.bashrc"
+        echo "$AUTOSTART_LINE" >> "$HOME/.bashrc"
+        echo "$AUTOSTART_CMD" >> "$HOME/.bashrc"
+        echo -e "  ${GREEN}✓${NC} Autostart added to ~/.bashrc"
+    else
+        echo -e "  ${GREEN}✓${NC} Autostart already in ~/.bashrc"
+    fi
+fi
+
+# Also try crontab @reboot
+if command -v crontab &>/dev/null; then
+    CRON_CMD="@reboot bash $PROJECT_ROOT/start_server.sh"
+    (crontab -l 2>/dev/null | grep -v "EAN AgentOS" ; echo "$CRON_CMD # EAN AgentOS") | crontab - 2>/dev/null
+    echo -e "  ${GREEN}✓${NC} Cron @reboot added"
+fi
+
 echo ""
 
 # ================================================================
