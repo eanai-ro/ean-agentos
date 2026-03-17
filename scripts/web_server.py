@@ -76,13 +76,6 @@ try:
 except ImportError:
     pass  # Universal API optional
 
-# V18D Orchestration API Blueprint
-try:
-    from orch_api import orch_bp
-    app.register_blueprint(orch_bp)
-except ImportError:
-    pass  # Orchestration API optional
-
 
 def get_db_connection() -> sqlite3.Connection:
     """Obține conexiune la baza de date."""

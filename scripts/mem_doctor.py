@@ -12,8 +12,14 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 
-MEMORY_DIR = Path.home() / ".claude" / "memory"
-DB_FILE = MEMORY_DIR / "global.db"
+try:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from v2_common import resolve_db_path
+    DB_FILE = resolve_db_path()
+    MEMORY_DIR = DB_FILE.parent
+except ImportError:
+    MEMORY_DIR = Path.home() / ".claude" / "memory"
+    DB_FILE = MEMORY_DIR / "global.db"
 
 def check_db_integrity():
     """Check 1: DB Integrity (quick_check pentru viteză)."""

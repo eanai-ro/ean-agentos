@@ -13,8 +13,12 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from collections import Counter
 
-MEMORY_DIR = Path.home() / ".claude" / "memory"
-DB_FILE = MEMORY_DIR / "global.db"
+try:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from v2_common import resolve_db_path
+    DB_FILE = resolve_db_path()
+except ImportError:
+    DB_FILE = Path.home() / ".claude" / "memory" / "global.db"
 
 def get_db():
     """Conectare DB."""

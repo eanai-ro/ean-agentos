@@ -1012,6 +1012,17 @@ def ensure_reviews_table(conn):
         print("✓ Reviews table created/verified (18H)")
 
 
+def ensure_observability_tables(conn):
+    """Migration 006: Audit log, detection rules, detection events."""
+    migration_path = Path(__file__).parent.parent / "migrations" / "006_observability_tables.sql"
+    if migration_path.exists():
+        conn.executescript(migration_path.read_text())
+        conn.commit()
+        print("✓ Observability tables created/verified (006)")
+    else:
+        print(f"⚠ Migration file not found: {migration_path}")
+
+
 def ensure_cli_agent_columns(conn):
     """Migration 020: Adaugă cli_name și agent_name la messages și sessions."""
     cur = conn.cursor()
@@ -1085,6 +1096,9 @@ def init_database(db_path: Path) -> bool:
         # V5E: Agent Activity Log
         ensure_activity_log_tables(conn)
 
+        # Migration 006: Observability (audit_log, detection_rules, detection_events)
+        ensure_observability_tables(conn)
+
         # V6: Universal Events
         ensure_universal_events_table(conn)
 
@@ -1099,15 +1113,6 @@ def init_database(db_path: Path) -> bool:
 
         # V15D: Memory Intelligence Layer
         ensure_intelligence_layer_tables(conn)
-
-        # V18D: Orchestration
-        ensure_orchestration_tables(conn)
-
-        # V18H: Peer Review
-        ensure_reviews_table(conn)
-
-        # V20: Skill Learning
-        ensure_skill_observations_table(conn)
 
         # Migration 020: CLI/Agent tracking columns
         ensure_cli_agent_columns(conn)

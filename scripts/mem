@@ -57,11 +57,6 @@ Comenzi disponibile:
   mem doctor --fix             Health check + remedieri automate
   mem doctor --json            Output JSON
 
-  mem quarantine list          Listează entries blocate
-  mem quarantine show <id>     Detalii entry specific
-  mem quarantine stats         Statistici quarantine
-  mem quarantine purge --all   Șterge toate entries
-
   mem panic panic              🚨 Incident response: freeze + backup + scan + report
   mem panic panic --scan-only  Doar scan, fără freeze
   mem panic panic --fix        Apply fixes (requires MEMORY_PANIC_ALLOW_FIX=1)
@@ -98,73 +93,7 @@ Comenzi disponibile:
   mem reconcile [--force]      Rulează transcript reconciler
   mem reload [--full]          Reload memorie (după compact)
 
-  --- 18C: Review Auto-Extracted ---
-
-  mem review                     Items auto-extracted pending review
-  mem review pending             Listează items de revizuit
-  mem review approve <type> <id> Aprobă item (decision/fact/resolution)
-  mem review reject <type> <id>  Rejectează item
-  mem review stats               Statistici pending/approved/rejected
-
-  --- 18D: Orchestration ---
-
-  mem orch create "title"         Creează proiect orchestrat (CLI curent = orchestrator)
-  mem orch status [project_id]    Status proiect(e)
-  mem orch add-task <proj> "t" "d" Adaugă task la proiect
-  mem orch tasks [--mine|--available] Listează task-uri
-  mem orch claim <task_id>        Claim task (cu lease de 30 min)
-  mem orch done <task_id> [summ]  Marchează task ca done
-  mem orch deliberate "topic"     Pornește deliberare (--type quick|deep|expert)
-  mem orch propose <sid> "text"   Propunere în runda curentă
-  mem orch vote <sid> <option>    Votează
-  mem orch send <to|all> "mesaj"  Trimite mesaj inter-agent
-  mem orch messages [--unread]    Citește mesaje
-  mem orch agents                 Cine e online
-  mem orch daemon [--once]        Pornește housekeeping daemon
-
-  --- V2: Decisions, Facts ---
-
-  mem decide -t "..." -d "..."   Înregistrează decizie nouă
-  mem decisions                  Listează decizii active
-  mem decisions --all            Toate (inclusiv superseded/archived)
-  mem decisions --stale          Doar decizii expirate
-  mem decisions show <id>        Detalii decizie
-  mem decisions supersede <id>   Înlocuiește decizie
-  mem decisions archive <id>     Arhivează decizie
-
-  mem learn "fact" -t type       Înregistrează cunoștință nouă
-  mem learn list                 Listează facts active
-  mem learn list --pinned        Doar pinned
-  mem learn search "query"       Caută în facts
-  mem learn show <id>            Detalii fact
-  mem learn deactivate <id>      Dezactivează fact
-  mem learn supersede <id> "x"   Înlocuiește fact
-  mem pin <id>                   Pin fact în context
-  mem unpin <id>                 Unpin fact
-
-  --- V2: Goals, Tasks, Projects ---
-
-  mem goal -t "..." -p high      Creează obiectiv nou
-  mem goal list                  Listează goals active
-  mem goal show <id>             Detalii goal + task-uri
-  mem goal complete <id>         Marchează completat
-  mem goal pause <id>            Pune pe pauză
-  mem goal abandon <id>          Abandonează
-
-  mem task -t "..." --goal 1     Creează task (opțional legat de goal)
-  mem task list                  Listează tasks active
-  mem task start <id>            todo → in_progress
-  mem task done <id>             → done
-  mem task block <id>            → blocked
-  mem task cancel <id>           → cancelled
-
-  mem project                    Profil proiect curent
-  mem project init               Creează profil proiect
-  mem project list               Toate proiectele
-  mem project note "text"        Adaugă notă
-  mem project set-stack '[...]'  Setează tech stack
-
-  --- V2C: Error Intelligence + Model Attribution ---
+  --- Error Resolution + Model Attribution ---
 
   mem resolve <err_id> -s "..."   Înregistrează rezolvare eroare
   mem resolve list                Listează rezolvări
@@ -200,39 +129,12 @@ Comenzi disponibile:
   mem patterns detect              Scanează și detectează patternuri noi
   mem patterns show <id>           Detalii pattern
 
-  mem intelligence                 Raport complet (patterns + conflicts + cleanup + promote)
-
-  mem cleanup                      Raport stale (facts, tasks, resolutions, goals)
-  mem cleanup mark                 Marchează stale (dezactivează/cancel)
+  mem cleanup                      Raport stale (resolutions, patterns)
+  mem cleanup mark                 Marchează stale
 
   mem promote                      Promovează automat facts importante (pin)
   mem promote scan                 Scanează și afișează scoruri
   mem promote list                 Listează candidați promovare
-
-  --- V5A: Checkpoints + Timeline ---
-
-  mem checkpoint create "<name>"   Creează checkpoint (snapshot logic)
-  mem checkpoint create "x" --full Salvează toate entitățile
-  mem checkpoint create "x" --compact  Doar pinned facts
-  mem checkpoint create "x" -d "..." Cu descriere
-  mem checkpoint list              Listează checkpoints
-  mem checkpoint show <id>         Detalii checkpoint
-  mem checkpoint restore <id>      Restaurare (safe mode, cere --force)
-  mem checkpoint restore <id> --force  Confirmă restore
-
-  mem timeline                     Vizualizare cronologică evenimente
-  mem timeline --days 7            Ultimele 7 zile
-  mem timeline --all               Toate evenimentele
-  mem timeline --type decision     Doar un tip
-
-  mem events                       🔄 Agent event stream
-  mem events --agent <name>        Filtrare pe agent
-  mem events --model <model>       Filtrare pe model
-  mem events --type <event_type>   Filtrare pe tip eveniment
-  mem events --branch <name>       Filtrare pe branch
-  mem events --failed              Doar evenimente eșuate
-  mem events --limit 20            Limită rezultate
-  mem events --json                Output JSON
 
   mem dashboard                    📊 Dashboard complet proiect curent
   mem dashboard --json             Output JSON
@@ -275,15 +177,12 @@ Comenzi disponibile:
 
 Exemple:
   mem backup                   # 14 zile retenție
-  mem backup --keep 30         # 30 zile retenție
   mem search "autentificare"
-  mem decide -t "SQLite nu PostgreSQL" -d "Simplitate și portabilitate"
-  mem learn "Python 3.10 nu creează event loop implicit" -t gotcha -c python
-  mem pin 1
+  mem suggest "CORS error"
   mem err last 5
   mem err resolve 158 -s "Am adăugat try/except"
   mem stats
-  mem trace 50
+  mem status
 """)
 
 def cmd_search(args):
@@ -424,9 +323,9 @@ def cmd_err(args):
                 limit = 10
 
         cursor.execute("""
-            SELECT id, created_at, tool_name_resolved,
+            SELECT id, created_at, error_type,
                    substr(error_message, 1, 80) as err_short,
-                   resolved, source
+                   solution_worked
             FROM errors_solutions
             ORDER BY id DESC
             LIMIT ?
@@ -437,15 +336,15 @@ def cmd_err(args):
             print("✅ Nicio eroare înregistrată.")
             return
 
-        print(f"\n{'ID':>5} {'Data':>12} {'Tool':>20} {'Resolved':>8} {'Eroare':<50}")
+        print(f"\n{'ID':>5} {'Data':>12} {'Tip':>20} {'Rezolvat':>8} {'Eroare':<50}")
         print("-" * 100)
         for row in rows:
-            id_, created, tool, err, resolved, source = row
+            id_, created, err_type, err, worked = row
             date_short = created[:10] if created else "?"
-            tool_short = (tool or "?")[:20]
-            resolved_str = "✅" if resolved else "❌"
+            type_short = (err_type or "?")[:20]
+            resolved_str = "✅" if worked else "❌"
             err_short = (err or "")[:50].replace("\n", " ")
-            print(f"{id_:>5} {date_short:>12} {tool_short:>20} {resolved_str:>8} {err_short:<50}")
+            print(f"{id_:>5} {date_short:>12} {type_short:>20} {resolved_str:>8} {err_short:<50}")
 
         print(f"\nTotal: {len(rows)} erori afișate")
 
@@ -473,13 +372,13 @@ def cmd_err(args):
         if "solution" in columns:
             cursor.execute("""
                 UPDATE errors_solutions
-                SET resolved = 1, solution = ?
+                SET solution_worked = 1, solution = ?, resolved_at = datetime('now')
                 WHERE id = ?
             """, (solution, err_id))
         else:
             cursor.execute("""
                 UPDATE errors_solutions
-                SET resolved = 1
+                SET solution_worked = 1, resolved_at = datetime('now')
                 WHERE id = ?
             """, (err_id,))
 
@@ -493,10 +392,10 @@ def cmd_err(args):
 
     elif args[0] == "unresolved":
         cursor.execute("""
-            SELECT id, created_at, tool_name_resolved,
+            SELECT id, created_at, error_type,
                    substr(error_message, 1, 60) as err_short
             FROM errors_solutions
-            WHERE resolved = 0 OR resolved IS NULL
+            WHERE solution_worked = 0 OR solution_worked IS NULL
             ORDER BY id DESC
             LIMIT 20
         """)
@@ -506,14 +405,14 @@ def cmd_err(args):
             print("✅ Toate erorile sunt rezolvate!")
             return
 
-        print(f"\n{'ID':>5} {'Data':>12} {'Tool':>20} {'Eroare':<60}")
+        print(f"\n{'ID':>5} {'Data':>12} {'Tip':>20} {'Eroare':<60}")
         print("-" * 100)
         for row in rows:
-            id_, created, tool, err = row
+            id_, created, err_type, err = row
             date_short = created[:10] if created else "?"
-            tool_short = (tool or "?")[:20]
+            type_short = (err_type or "?")[:20]
             err_short = (err or "")[:60].replace("\n", " ")
-            print(f"{id_:>5} {date_short:>12} {tool_short:>20} {err_short:<60}")
+            print(f"{id_:>5} {date_short:>12} {type_short:>20} {err_short:<60}")
 
         print(f"\n❌ {len(rows)} erori nerezolvate")
 
@@ -550,10 +449,16 @@ def cmd_stats():
     # Erori
     cursor.execute("SELECT COUNT(*) FROM errors_solutions")
     err_total = cursor.fetchone()[0]
-    cursor.execute("SELECT COUNT(*) FROM errors_solutions WHERE resolved = 1")
-    err_resolved = cursor.fetchone()[0]
-    cursor.execute("SELECT COUNT(*) FROM errors_solutions WHERE source = 'auto_reconciler'")
-    err_reconciler = cursor.fetchone()[0]
+    try:
+        cursor.execute("SELECT COUNT(*) FROM errors_solutions WHERE solution_worked = 1")
+        err_resolved = cursor.fetchone()[0]
+    except Exception:
+        err_resolved = 0
+    try:
+        cursor.execute("SELECT COUNT(*) FROM errors_solutions WHERE source = 'auto_reconciler'")
+        err_reconciler = cursor.fetchone()[0]
+    except Exception:
+        err_reconciler = 0
     print(f"❌ Erori totale:         {err_total:,}")
     print(f"✅ Erori rezolvate:      {err_resolved:,}")
     print(f"🔄 Din reconciler:       {err_reconciler:,}")
@@ -672,18 +577,6 @@ def cmd_doctor(args):
     result = subprocess.run(cmd)
     sys.exit(result.returncode)
 
-def cmd_quarantine(args):
-    """Management quarantine entries."""
-    script = SCRIPTS_DIR / "mem_quarantine.py"
-    if not script.exists():
-        print(f"❌ Script quarantine lipsă: {script}")
-        return
-
-    # Pasează toate args către mem_quarantine.py
-    cmd = ["python3", str(script)] + args
-    result = subprocess.run(cmd)
-    sys.exit(result.returncode)
-
 def cmd_panic(args):
     """Incident response și secrets hunt."""
     script = SCRIPTS_DIR / "mem_panic.py"
@@ -733,119 +626,6 @@ def cmd_fp(args):
     cmd = ["python3", str(script)] + args
     result = subprocess.run(cmd)
     sys.exit(result.returncode)
-
-
-def cmd_decide(args):
-    """Înregistrare decizie nouă."""
-    script = V2_SCRIPTS_DIR / "decision_tracker.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-    cmd = ["python3", str(script), "add"] + args
-    subprocess.run(cmd)
-
-
-def cmd_decisions(args):
-    """Listare/gestionare decizii."""
-    script = V2_SCRIPTS_DIR / "decision_tracker.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-
-    # Detectează subcomenzile: show, supersede, archive
-    if args and args[0] in ("show", "supersede", "archive"):
-        cmd = ["python3", str(script)] + args
-    else:
-        cmd = ["python3", str(script), "list"] + args
-
-    subprocess.run(cmd)
-
-
-def cmd_learn(args):
-    """Gestionare cunoștințe (learned facts)."""
-    script = V2_SCRIPTS_DIR / "learned_facts.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-
-    # Detectează subcomenzile: list, search, show, deactivate, supersede, pin, unpin
-    if args and args[0] in ("list", "search", "show", "deactivate", "supersede", "pin", "unpin"):
-        cmd = ["python3", str(script)] + args
-    else:
-        # Default: add (primul argument e textul fact-ului)
-        cmd = ["python3", str(script), "add"] + args
-
-    subprocess.run(cmd)
-
-
-def cmd_pin(args):
-    """Pin un fact în context."""
-    script = V2_SCRIPTS_DIR / "learned_facts.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-    cmd = ["python3", str(script), "pin"] + args
-    subprocess.run(cmd)
-
-
-def cmd_unpin(args):
-    """Unpin un fact."""
-    script = V2_SCRIPTS_DIR / "learned_facts.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-    cmd = ["python3", str(script), "unpin"] + args
-    subprocess.run(cmd)
-
-
-def cmd_goal(args):
-    """Gestionare goals."""
-    script = V2_SCRIPTS_DIR / "goal_tracker.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-
-    # Detectează subcomenzile: list, show, complete, pause, abandon
-    if args and args[0] in ("list", "show", "complete", "pause", "abandon"):
-        cmd = ["python3", str(script), "goal"] + args
-    else:
-        # Default: add
-        cmd = ["python3", str(script), "goal", "add"] + args
-
-    subprocess.run(cmd)
-
-
-def cmd_task(args):
-    """Gestionare tasks."""
-    script = V2_SCRIPTS_DIR / "goal_tracker.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-
-    # Detectează subcomenzile: list, start, done, block, cancel
-    if args and args[0] in ("list", "start", "done", "block", "cancel"):
-        cmd = ["python3", str(script), "task"] + args
-    else:
-        # Default: add
-        cmd = ["python3", str(script), "task", "add"] + args
-
-    subprocess.run(cmd)
-
-
-def cmd_project(args):
-    """Gestionare profiluri proiecte."""
-    script = V2_SCRIPTS_DIR / "project_profile.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-
-    if args and args[0] in ("init", "show", "list", "note", "set-stack", "set-conventions"):
-        cmd = ["python3", str(script)] + args
-    else:
-        # Default: show profil curent
-        cmd = ["python3", str(script), "show"] + args
-
-    subprocess.run(cmd)
 
 
 def cmd_intent(args):
@@ -952,7 +732,6 @@ def cmd_intelligence(args):
     print("\n🧠 MEMORY INTELLIGENCE REPORT\n")
     for name, script_name, default_cmd in [
         ("Error Patterns", "error_patterns.py", "list"),
-        ("Decision Conflicts", "decision_analyzer.py", "conflicts"),
         ("Memory Cleanup", "memory_cleanup.py", "report"),
     ]:
         script = V2_SCRIPTS_DIR / script_name
@@ -999,49 +778,6 @@ def cmd_promote(args):
 def cmd_dashboard(args):
     """Dashboard complet proiect curent."""
     script = V2_SCRIPTS_DIR / "dashboard_cli.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-    cmd = ["python3", str(script)] + args
-    subprocess.run(cmd)
-
-
-def cmd_checkpoint(args):
-    """Gestionare checkpoints."""
-    script = V2_SCRIPTS_DIR / "checkpoint_manager.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-    if args and args[0] in ("create", "list", "show", "restore"):
-        cmd = ["python3", str(script)] + args
-    else:
-        cmd = ["python3", str(script), "list"] + args
-    subprocess.run(cmd)
-
-
-def cmd_timeline(args):
-    """Vizualizare cronologică evenimente."""
-    script = V2_SCRIPTS_DIR / "timeline.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-    cmd = ["python3", str(script)] + args
-    subprocess.run(cmd)
-
-
-def cmd_activity(args):
-    """Vizualizare activitate agenți."""
-    script = V2_SCRIPTS_DIR / "activity_log.py"
-    if not script.exists():
-        print(f"❌ Script lipsă: {script}")
-        return
-    cmd = ["python3", str(script)] + args
-    subprocess.run(cmd)
-
-
-def cmd_events(args):
-    """Vizualizare agent event stream."""
-    script = V2_SCRIPTS_DIR / "agent_events.py"
     if not script.exists():
         print(f"❌ Script lipsă: {script}")
         return
@@ -1163,347 +899,6 @@ def cmd_review(args):
     conn.close()
 
 
-def cmd_orch(args):
-    """Orchestrare multi-agent (18D-20). Requires Pro license."""
-    if not args:
-        args = ["help"]
-
-    subcmd = args[0]
-
-    # License gate (only active when ORCH_LICENSE_CHECK=1)
-    if subcmd != "help" and subcmd not in ("", None):
-        if os.environ.get("ORCH_LICENSE_CHECK") == "1":
-            try:
-                sys.path.insert(0, str(V2_SCRIPTS_DIR))
-                from license_gate import require_premium
-                require_premium("orchestration")
-            except SystemExit:
-                return
-            except ImportError:
-                pass
-    sub_args = args[1:]
-
-    # Detectăm CLI-ul curent din env sau default
-    cli_name = os.environ.get("MEMORY_AGENT_NAME", "claude-code")
-
-    if subcmd == "create":
-        if not sub_args:
-            print("  Usage: mem orch create <title> [description]")
-            return
-        title = sub_args[0]
-        desc = sub_args[1] if len(sub_args) > 1 else ""
-        script = V2_SCRIPTS_DIR / "orchestrator.py"
-        subprocess.run(["python3", str(script), "create-project", title, desc, cli_name])
-
-    elif subcmd == "status":
-        script = V2_SCRIPTS_DIR / "orchestrator.py"
-        if sub_args:
-            subprocess.run(["python3", str(script), "status", sub_args[0]])
-        else:
-            # Listează toate proiectele active
-            sys.path.insert(0, str(V2_SCRIPTS_DIR))
-            from v2_common import get_db as v2_get_db
-            conn = v2_get_db()
-            cur = conn.cursor()
-            cur.execute("SELECT id, title, orchestrator_cli, status, created_at FROM orchestration_projects ORDER BY created_at DESC LIMIT 10")
-            rows = cur.fetchall()
-            conn.close()
-            if not rows:
-                print("  Niciun proiect orchestrat.")
-            else:
-                print(f"  {'ID':<5} {'Titlu':<30} {'Orchestrator':<15} {'Status':<10} {'Creat':<16}")
-                print(f"  {'-'*5} {'-'*30} {'-'*15} {'-'*10} {'-'*16}")
-                for r in rows:
-                    print(f"  {r[0]:<5} {r[1][:30]:<30} {r[2]:<15} {r[3]:<10} {str(r[4])[:16]:<16}")
-
-    elif subcmd == "add-task":
-        if len(sub_args) < 3:
-            print("  Usage: mem orch add-task <project_id> <title> <description> [--type X] [--priority X] [--skills a,b]")
-            return
-        script = V2_SCRIPTS_DIR / "orchestrator.py"
-        cmd = ["python3", str(script), "add-task"] + sub_args + ["--created-by", cli_name]
-        subprocess.run(cmd)
-
-    elif subcmd == "tasks":
-        script = V2_SCRIPTS_DIR / "orchestrator.py"
-        if "--mine" in sub_args:
-            subprocess.run(["python3", str(script), "my-tasks", cli_name])
-        elif "--available" in sub_args:
-            subprocess.run(["python3", str(script), "tasks", cli_name])
-        else:
-            subprocess.run(["python3", str(script), "tasks"])
-
-    elif subcmd == "claim":
-        if not sub_args:
-            print("  Usage: mem orch claim <task_id>")
-            return
-        script = V2_SCRIPTS_DIR / "orchestrator.py"
-        subprocess.run(["python3", str(script), "claim", sub_args[0], cli_name])
-
-    elif subcmd == "done":
-        if not sub_args:
-            print("  Usage: mem orch done <task_id> [summary]")
-            return
-        # Trebuie lease_token — îl citim din task
-        sys.path.insert(0, str(V2_SCRIPTS_DIR))
-        from v2_common import get_db as v2_get_db
-        conn = v2_get_db()
-        cur = conn.cursor()
-        cur.execute("SELECT lease_token FROM orch_tasks WHERE id = ? AND assigned_cli = ?",
-                     (int(sub_args[0]), cli_name))
-        row = cur.fetchone()
-        conn.close()
-        if not row or not row[0]:
-            print(f"  ❌ Nu ai lease pe task #{sub_args[0]}")
-            return
-        summary = sub_args[1] if len(sub_args) > 1 else ""
-        script = V2_SCRIPTS_DIR / "orchestrator.py"
-        subprocess.run(["python3", str(script), "complete", sub_args[0], row[0], summary])
-
-    elif subcmd == "deliberate":
-        if not sub_args:
-            print("  Usage: mem orch deliberate <topic> [--type quick|deep|expert]")
-            return
-        script = V2_SCRIPTS_DIR / "deliberation.py"
-        cmd = ["python3", str(script), "create", sub_args[0], "--started-by", cli_name]
-        for i, arg in enumerate(sub_args[1:], 1):
-            if arg == "--type" and i + 1 < len(sub_args):
-                cmd += ["--type", sub_args[i + 1]]
-        subprocess.run(cmd)
-
-    elif subcmd == "propose":
-        if len(sub_args) < 2:
-            print("  Usage: mem orch propose <session_id> <content> [--confidence 0.8]")
-            return
-        script = V2_SCRIPTS_DIR / "deliberation.py"
-        cmd = ["python3", str(script), "propose", sub_args[0], cli_name, sub_args[1]]
-        for i, arg in enumerate(sub_args[2:], 2):
-            if arg == "--confidence" and i + 1 < len(sub_args):
-                cmd += ["--confidence", sub_args[i + 1]]
-        subprocess.run(cmd)
-
-    elif subcmd == "vote":
-        if len(sub_args) < 2:
-            print("  Usage: mem orch vote <session_id> <option> [reasoning]")
-            return
-        script = V2_SCRIPTS_DIR / "deliberation.py"
-        cmd = ["python3", str(script), "vote", sub_args[0], cli_name, sub_args[1]]
-        if len(sub_args) > 2:
-            cmd.append(sub_args[2])
-        subprocess.run(cmd)
-
-    elif subcmd == "send":
-        if len(sub_args) < 2:
-            print("  Usage: mem orch send <to_cli|all> <message> [--type info|question|review]")
-            return
-        script = V2_SCRIPTS_DIR / "orchestrator.py"
-        to = sub_args[0] if sub_args[0] != "all" else None
-        cmd = ["python3", str(script), "send", cli_name, sub_args[1]]
-        if to:
-            cmd += ["--to", to]
-        for i, arg in enumerate(sub_args[2:], 2):
-            if arg == "--type" and i + 1 < len(sub_args):
-                cmd += ["--type", sub_args[i + 1]]
-        subprocess.run(cmd)
-
-    elif subcmd == "messages":
-        script = V2_SCRIPTS_DIR / "orchestrator.py"
-        cmd = ["python3", str(script), "messages", "--to", cli_name]
-        if "--unread" in sub_args:
-            cmd.append("--unread")
-        subprocess.run(cmd)
-
-    elif subcmd == "agents":
-        script = V2_SCRIPTS_DIR / "orchestrator.py"
-        subprocess.run(["python3", str(script), "agents"])
-
-    elif subcmd == "daemon":
-        script = V2_SCRIPTS_DIR / "orch_daemon.py"
-        cmd = ["python3", str(script)]
-        if "--once" in sub_args:
-            cmd.append("--once")
-        subprocess.run(cmd)
-
-    elif subcmd == "launch":
-        script = V2_SCRIPTS_DIR / "cli_launcher.py"
-        if len(sub_args) < 2:
-            print("  Usage: mem orch launch <cli_name> --task <id> [--timeout 300] [--perm safe|auto|unsafe]")
-            print("         mem orch launch <cli_name> --deliberate <session_id>")
-            print("         mem orch launch <cli_name> --prompt 'text'")
-            return
-        cli_name = sub_args[0]
-        cmd = ["python3", str(script)]
-        if "--task" in sub_args:
-            idx = sub_args.index("--task")
-            cmd += ["task", cli_name, sub_args[idx + 1]]
-        elif "--deliberate" in sub_args:
-            idx = sub_args.index("--deliberate")
-            cmd += ["deliberate", cli_name, sub_args[idx + 1]]
-        elif "--prompt" in sub_args:
-            idx = sub_args.index("--prompt")
-            cmd += ["prompt", cli_name, sub_args[idx + 1]]
-        else:
-            print("  Specifică --task, --deliberate, sau --prompt")
-            return
-        # Pass through optional flags
-        for flag in ["--timeout", "--perm", "--dir"]:
-            if flag in sub_args:
-                fi = sub_args.index(flag)
-                if fi + 1 < len(sub_args):
-                    cmd += [flag, sub_args[fi + 1]]
-        subprocess.run(cmd)
-
-    elif subcmd == "launches":
-        script = V2_SCRIPTS_DIR / "cli_launcher.py"
-        subprocess.run(["python3", str(script), "launches"])
-
-    elif subcmd == "deliberate-auto":
-        if len(sub_args) < 1:
-            print("  Usage: mem orch deliberate-auto <question> [--type deep] [--timeout 120]")
-            return
-        script = V2_SCRIPTS_DIR / "auto_loop.py"
-        cmd = ["python3", str(script), "deliberate", sub_args[0]]
-        for flag in ["--type", "--timeout", "--perm", "--participants"]:
-            if flag in sub_args:
-                fi = sub_args.index(flag)
-                if fi + 1 < len(sub_args):
-                    cmd += [flag, sub_args[fi + 1]]
-        subprocess.run(cmd)
-
-    elif subcmd == "run-project":
-        if len(sub_args) < 1:
-            print("  Usage: mem orch run-project <project_id> [--timeout 300] [--review]")
-            return
-        script = V2_SCRIPTS_DIR / "auto_loop.py"
-        cmd = ["python3", str(script), "run-project", sub_args[0]]
-        for flag in ["--timeout", "--perm"]:
-            if flag in sub_args:
-                fi = sub_args.index(flag)
-                if fi + 1 < len(sub_args):
-                    cmd += [flag, sub_args[fi + 1]]
-        if "--review" in sub_args:
-            cmd.append("--review")
-        if "--auto-fix" in sub_args:
-            cmd.append("--auto-fix")
-        subprocess.run(cmd)
-
-    elif subcmd == "review":
-        if len(sub_args) < 1:
-            print("  Usage: mem orch review <task_id> --by <cli_name>")
-            return
-        task_id = sub_args[0]
-        reviewer = "gemini-cli"
-        if "--by" in sub_args:
-            idx = sub_args.index("--by")
-            if idx + 1 < len(sub_args):
-                reviewer = sub_args[idx + 1]
-        script = V2_SCRIPTS_DIR / "cli_launcher.py"
-        # Use python to call launch_for_review
-        subprocess.run(["python3", "-c",
-            f"import sys; sys.path.insert(0,'{V2_SCRIPTS_DIR}'); "
-            f"from cli_launcher import launch_for_review; "
-            f"import json; r=launch_for_review('{reviewer}',{task_id}); "
-            f"print(json.dumps(r,indent=2,default=str,ensure_ascii=False))"])
-
-    elif subcmd == "reviews":
-        import sqlite3
-        conn = sqlite3.connect(str(DB_PATH))
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        query = "SELECT r.id, r.task_id, r.reviewer_cli, r.verdict, r.severity, r.original_cli, r.created_at FROM orch_reviews r"
-        params = []
-        conditions = []
-        if "--task" in sub_args:
-            idx = sub_args.index("--task")
-            if idx + 1 < len(sub_args):
-                conditions.append("r.task_id = ?")
-                params.append(int(sub_args[idx + 1]))
-        if "--verdict" in sub_args:
-            idx = sub_args.index("--verdict")
-            if idx + 1 < len(sub_args):
-                conditions.append("r.verdict = ?")
-                params.append(sub_args[idx + 1])
-        if conditions:
-            query += " WHERE " + " AND ".join(conditions)
-        query += " ORDER BY r.created_at DESC LIMIT 20"
-        cur.execute(query, params)
-        rows = cur.fetchall()
-        conn.close()
-        if not rows:
-            print("  Niciun review găsit.")
-        else:
-            print(f"  {'ID':<5} {'Task':<6} {'Reviewer':<15} {'Verdict':<20} {'Severity':<10} {'Original':<15} {'Creat':<16}")
-            print("  " + "-" * 87)
-            for r in rows:
-                print(f"  {r['id']:<5} #{r['task_id']:<5} {r['reviewer_cli']:<15} {r['verdict']:<20} {r['severity']:<10} {r['original_cli'] or '-':<15} {r['created_at'][:16]}")
-
-    elif subcmd == "replay":
-        if len(sub_args) < 1:
-            print("  Usage: mem orch replay <project_id> [--json]")
-            return
-        script = V2_SCRIPTS_DIR / "replay.py"
-        cmd = ["python3", str(script), "project", sub_args[0]]
-        if "--json" in sub_args:
-            cmd.append("--json")
-        subprocess.run(cmd)
-
-    elif subcmd == "replay-delib":
-        if len(sub_args) < 1:
-            print("  Usage: mem orch replay-delib <session_id> [--json]")
-            return
-        script = V2_SCRIPTS_DIR / "replay.py"
-        cmd = ["python3", str(script), "deliberation", sub_args[0]]
-        if "--json" in sub_args:
-            cmd.append("--json")
-        subprocess.run(cmd)
-
-    elif subcmd == "capabilities":
-        script = V2_SCRIPTS_DIR / "intelligence.py"
-        subprocess.run(["python3", str(script), "leaderboard"])
-
-    elif subcmd == "skills":
-        if len(sub_args) < 1:
-            # All CLIs
-            script = V2_SCRIPTS_DIR / "intelligence.py"
-            subprocess.run(["python3", "-c",
-                f"import sys; sys.path.insert(0,'{V2_SCRIPTS_DIR}'); "
-                f"from intelligence import get_learned_skills; "
-                f"from v2_common import VALID_CLI_NAMES; "
-                f"import json; "
-                f"[print(f'  {{cli}}:', json.dumps(get_learned_skills(cli), indent=4)) for cli in VALID_CLI_NAMES]"])
-        else:
-            cli_name = sub_args[0]
-            subprocess.run(["python3", "-c",
-                f"import sys; sys.path.insert(0,'{V2_SCRIPTS_DIR}'); "
-                f"from intelligence import get_learned_skills; "
-                f"import json; print(json.dumps(get_learned_skills('{cli_name}'), indent=2))"])
-
-    else:
-        print("  Orchestration — Comenzi:")
-        print("    mem orch create <title>           — Creează proiect")
-        print("    mem orch status [project_id]      — Status")
-        print("    mem orch add-task <p> <t> <d>     — Adaugă task")
-        print("    mem orch tasks [--mine|--available]— Listează task-uri")
-        print("    mem orch claim <task_id>          — Claim task")
-        print("    mem orch done <task_id> [summary] — Marchează done")
-        print("    mem orch deliberate <topic>       — Pornește deliberare manuală")
-        print("    mem orch propose <sid> <text>     — Propunere")
-        print("    mem orch vote <sid> <option>      — Votează")
-        print("    mem orch send <to> <mesaj>        — Mesaj inter-agent")
-        print("    mem orch messages [--unread]      — Citește mesaje")
-        print("    mem orch agents                   — Status agenți")
-        print("    mem orch daemon [--once]          — Housekeeping daemon")
-        print("    mem orch launch <cli> --task <id> — Lansează CLI pentru task")
-        print("    mem orch launches                 — Listează launch-uri active")
-        print("    mem orch deliberate-auto <q>      — Deliberare AUTOMATĂ")
-        print("    mem orch run-project <id> [--review] — Rulează task-uri (+auto review)")
-        print("    mem orch review <task_id> --by <cli> — Peer review pe un task")
-        print("    mem orch reviews [--task X]       — Listează reviews")
-        print("    mem orch replay <project_id>      — Timeline proiect")
-        print("    mem orch replay-delib <session_id> — Timeline deliberare")
-        print("    mem orch capabilities             — Leaderboard capabilities")
-
-
 def cmd_model(args):
     """Gestionare model/provider curent."""
     script = V2_SCRIPTS_DIR / "model_logger.py"
@@ -1532,7 +927,6 @@ def main():
         "help": lambda: cmd_help(),
         "backup": lambda: cmd_backup(args),
         "doctor": lambda: cmd_doctor(args),
-        "quarantine": lambda: cmd_quarantine(args),
         "panic": lambda: cmd_panic(args),
         "status": lambda: cmd_status(args),
         "audit": lambda: cmd_audit(args),
@@ -1545,51 +939,32 @@ def main():
         "trace": lambda: cmd_trace(args),
         "reconcile": lambda: cmd_reconcile(args),
         "reload": lambda: cmd_reload(args),
-        # V2: Decisions + Facts
-        "decide": lambda: cmd_decide(args),
-        "decisions": lambda: cmd_decisions(args),
-        "learn": lambda: cmd_learn(args),
-        "pin": lambda: cmd_pin(args),
-        "unpin": lambda: cmd_unpin(args),
-        # V2: Goals, Tasks, Projects
-        "goal": lambda: cmd_goal(args),
-        "task": lambda: cmd_task(args),
-        "project": lambda: cmd_project(args),
-        # V2C: Error Intelligence + Model Attribution
+        # Error Resolution + Model Attribution
         "resolve": lambda: cmd_resolve(args),
         "model": lambda: cmd_model(args),
-        # V2: Context Builder + Intent + Strategy
+        # Context Builder + Intent + Strategy
         "context": lambda: cmd_context(args),
         "intent": lambda: cmd_intent(args),
         "strategy": lambda: cmd_strategy(args),
-        # V4: Intelligence Layer
+        # Intelligence Layer
         "patterns": lambda: cmd_patterns(args),
         "intelligence": lambda: cmd_intelligence(args),
         "cleanup": lambda: cmd_cleanup(args),
         "promote": lambda: cmd_promote(args),
-        # V5A: Checkpoints + Timeline
+        # Dashboard
         "dashboard": lambda: cmd_dashboard(args),
-        "checkpoint": lambda: cmd_checkpoint(args),
-        "timeline": lambda: cmd_timeline(args),
-        # V5E: Activity Log
-        "activity": lambda: cmd_activity(args),
-        # V12A: Agent Event Stream
-        "events": lambda: cmd_events(args),
-        # V9: Memory Branches
+        # Memory Branches
         "branch": lambda: cmd_branch(args),
-        # V15B: Cognitive Memory
+        # Cognitive Memory
         "errorlearn": lambda: cmd_errorlearn(args),
-        # V15C: Cognitive Memory Stage 2
         "replay": lambda: cmd_replay(args),
         "learnings": lambda: cmd_learnings(args),
-        # V15D: Memory Intelligence Layer
+        # Memory Intelligence Layer
         "score": lambda: cmd_score(args),
         "graph": lambda: cmd_graph(args),
         "suggest": lambda: cmd_suggest(args),
-        # 18C: Review auto-extracted items
+        # Review auto-extracted items
         "review": lambda: cmd_review(args),
-        # 18D: Orchestration
-        "orch": lambda: cmd_orch(args),
     }
 
     if command in commands:
