@@ -23,3 +23,13 @@ if [ -f scripts/codex_rollout_watcher.py ] && command -v codex &>/dev/null; then
         echo "  Already running: Codex rollout watcher"
     fi
 fi
+
+# Start Kimi session watcher if Kimi is installed
+if [ -f scripts/kimi_session_watcher.py ] && command -v kimi &>/dev/null; then
+    if ! pgrep -f "kimi_session_watcher" > /dev/null 2>&1; then
+        nohup python3 scripts/kimi_session_watcher.py --watch --interval 10 > /dev/null 2>&1 &
+        echo "  Started: Kimi session watcher (interval 10s)"
+    else
+        echo "  Already running: Kimi session watcher"
+    fi
+fi
