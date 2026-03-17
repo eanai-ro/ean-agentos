@@ -9,6 +9,8 @@
 
 **Never solve the same bug twice.**
 
+![EAN AgentOS Demo](demo_free.gif)
+
 ---
 
 ## What does EAN AgentOS do?
