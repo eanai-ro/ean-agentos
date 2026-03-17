@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
-[![Tests: 57 passing](https://img.shields.io/badge/Tests-57%20passing-brightgreen.svg)](test_full.sh)
+[![Tests: 48 passing](https://img.shields.io/badge/Tests-48%20passing-brightgreen.svg)](test_full.sh)
 [![CLIs: Claude · Gemini · Codex · Kimi](https://img.shields.io/badge/CLIs-Claude%20·%20Gemini%20·%20Codex%20·%20Kimi-purple.svg)](#supported-clis)
 
 ### Persistent Memory for AI Coding Agents
@@ -70,7 +70,7 @@ $ mem suggest 'CORS error'
 | CLI | Install | Required? |
 |-----|---------|-----------|
 | [Claude Code](https://claude.ai/code) | `npm install -g @anthropic-ai/claude-code` | At least one |
-| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `npm install -g @anthropic-ai/gemini-cli` | At least one |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli) | `npm install -g @google/gemini-cli` | At least one |
 | [Codex CLI](https://github.com/openai/codex) | `npm install -g @openai/codex` | At least one |
 | [Kimi CLI](https://github.com/MoonshotAI/kimi-cli) | `pip install kimi-cli` | At least one |
 
@@ -167,7 +167,7 @@ All CLIs read and write to the same database. What one agent learns is available
                │  error_resolutions       │
                │  experience_graph        │
                │  solution_index          │
-               │  ...49 tables            │
+               │  ...52 tables            │
                └──────────────────────────┘
                       │
           ┌───────────┼───────────┐
@@ -205,7 +205,7 @@ ean-agentos/
 ├── mcp-server/                  # MCP for Kimi CLI
 ├── migrations/                  # DB schema
 ├── install.sh                   # Interactive installer
-├── test_full.sh                 # Test suite (57 tests)
+├── test_full.sh                 # Test suite (48 tests)
 └── Dockerfile                   # Test container
 ```
 
@@ -217,7 +217,7 @@ ean-agentos/
 ./test_full.sh
 ```
 
-57 tests covering: structure, database, imports, license gate, mem suggest, experience graph, context builder, search, web server, MCP, DB integrity, backup.
+48 tests covering: structure, database, imports, mem suggest, experience graph, context builder, search, web server, MCP, DB integrity, backup.
 
 ---
 
@@ -240,7 +240,7 @@ ean-agentos/
 | ✅ MCP server (Claude Code integration) | **Yes** |
 | ✅ CLI tool (`mem`) with 30+ commands | **Yes** |
 | ✅ Hooks for Claude Code, Gemini CLI, Codex CLI, Kimi CLI | **Yes** |
-| ✅ 49 database tables, 57 tests | **Yes** |
+| ✅ 52 database tables, 48 tests | **Yes** |
 
 ### Pro 🔒 — Everything in Free + multi-agent orchestration
 

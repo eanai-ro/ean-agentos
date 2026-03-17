@@ -132,7 +132,7 @@ Toate CLI-urile citesc și scriu în aceeași bază de date. Ceea ce învață u
                │  error_resolutions       │
                │  experience_graph        │
                │  solution_index          │
-               │  ...49 tabele            │
+               │  ...52 tabele            │
                └──────────────────────────┘
                       │
           ┌───────────┼───────────┐
@@ -170,7 +170,7 @@ ean-agentos/
 ├── mcp-server/                  # MCP pentru Kimi CLI
 ├── migrations/                  # Schema DB
 ├── install.sh                   # Installer interactiv
-├── test_full.sh                 # Test suite (57 teste)
+├── test_full.sh                 # Test suite (48 teste)
 └── Dockerfile                   # Container test
 ```
 
@@ -182,7 +182,7 @@ ean-agentos/
 ./test_full.sh
 ```
 
-57 teste acoperă: structură, database, importuri, license gate, mem suggest, experience graph, context builder, search, web server, MCP, integritate DB, backup.
+48 teste acoperă: structură, database, importuri, license gate, mem suggest, experience graph, context builder, search, web server, MCP, integritate DB, backup.
 
 ---
 

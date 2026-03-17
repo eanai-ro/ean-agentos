@@ -62,7 +62,7 @@ cd ean-agentos
 
 The installer:
 1. Installs Python dependencies
-2. Initializes database (49 tables)
+2. Initializes database (52 tables)
 3. Creates `mem` command in PATH
 4. Detects installed CLIs with interactive selector
 5. Configures hooks and MCP server

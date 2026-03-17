@@ -194,7 +194,7 @@ if [ $INSTALL_GEMINI -eq 1 ]; then
             echo -e "  ${GREEN}✓${NC} Gemini CLI — hooks installed" || \
             echo -e "  ${YELLOW}⚠${NC} Gemini CLI — manual setup needed"
     else
-        echo -e "  ${YELLOW}⚠${NC} Gemini CLI — not installed. Install: npm i -g @anthropic-ai/gemini-cli"
+        echo -e "  ${YELLOW}⚠${NC} Gemini CLI — not installed. Install: npm i -g @google/gemini-cli"
     fi
 fi
 
@@ -307,9 +307,7 @@ python3 -c "from context_builder_v2 import build_context; print('OK')" 2>/dev/nu
     echo -e "  ${GREEN}✓${NC} Context builder" || \
     echo -e "  ${RED}✗${NC} Context builder broken"
 
-python3 -c "from license_gate import get_plan; print(get_plan())" 2>/dev/null && \
-    echo -e "  ${GREEN}✓${NC} License gate" || \
-    echo -e "  ${RED}✗${NC} License gate broken"
+echo -e "  ${GREEN}✓${NC} Free edition active"
 
 echo ""
 

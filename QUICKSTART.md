@@ -11,7 +11,7 @@ Get started in 60 seconds.
 npm install -g @anthropic-ai/claude-code
 
 # Or Gemini CLI
-npm install -g @anthropic-ai/gemini-cli
+npm install -g @google/gemini-cli
 
 # Or Codex CLI
 npm install -g @openai/codex

@@ -37,3 +37,20 @@ Thumbs.db
 # Test artifacts
 tests/test_*.db
 ean-agentos.log
+
+# Runtime state files
+.context_monitor_state.json
+.context_snapshot.json
+.context_strategy.log
+.current_session
+.current_model
+.current_intent
+.current_branch
+.kimi_watcher_state.json
+codex_watcher_state.json
+*.cast
+
+# Build artifacts
+*.tar.gz
+file_versions/
+output/
