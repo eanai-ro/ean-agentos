@@ -1093,7 +1093,7 @@ def get_memory_context(project_path: str, limit_messages: int = 10, limit_errors
 
         # 2. Ultimele mesaje relevante pentru acest proiect
         cursor.execute("""
-            SELECT role, substr(content, 1, 300) as content, timestamp
+            SELECT role, content, timestamp
             FROM messages
             WHERE project_path = ? OR project_path LIKE ?
             ORDER BY timestamp DESC
@@ -1105,12 +1105,12 @@ def get_memory_context(project_path: str, limit_messages: int = 10, limit_errors
             context_parts.append("\n💬 ULTIMELE CONVERSAȚII (acest proiect):")
             for msg in reversed(messages):  # Cronologic
                 role_icon = "👤" if msg[0] == 'user' else "🤖"
-                content = msg[1].replace('\n', ' ')[:200]
+                content = msg[1].replace('\n', ' ')
                 context_parts.append(f"  {role_icon} {content}...")
 
         # 3. Erori rezolvate recent (pentru a nu le repeta)
         cursor.execute("""
-            SELECT error_type, substr(error_message, 1, 100), substr(solution, 1, 200)
+            SELECT error_type, error_message, solution
             FROM errors_solutions
             WHERE solution IS NOT NULL AND solution_worked = 1
             ORDER BY resolved_at DESC
@@ -1144,7 +1144,7 @@ def get_memory_context(project_path: str, limit_messages: int = 10, limit_errors
 
         # 5. Ultimele decizii importante (mesaje assistant cu keywords)
         cursor.execute("""
-            SELECT substr(content, 1, 200)
+            SELECT content
             FROM messages
             WHERE role = 'assistant'
               AND (content LIKE '%configurat%' OR content LIKE '%creat%'
@@ -1668,7 +1668,7 @@ def handle_user_prompt(data: Optional[Dict] = None):
         with open(session_md, 'a') as f:
             timestamp = datetime.now().strftime('%H:%M:%S')
             # Limitează la primele 200 caractere pentru Markdown (folosește scrubbed)
-            preview = prompt_scrubbed[:200] + "..." if len(prompt_scrubbed) > 200 else prompt_scrubbed
+            preview = prompt_scrubbed[:1000] + "..." if len(prompt_scrubbed) > 1000 else prompt_scrubbed
             preview = preview.replace('\n', ' ')
             f.write(f"\n### [{timestamp}] User:\n> {preview}\n\n")
 
@@ -1835,7 +1835,7 @@ def handle_reconcile_now():
 
             # Ultimele 3 erori
             cursor.execute("""
-                SELECT session_id, error_type, substr(error_message, 1, 100), created_at
+                SELECT session_id, error_type, error_message, created_at
                 FROM errors_solutions
                 ORDER BY created_at DESC
                 LIMIT 3
