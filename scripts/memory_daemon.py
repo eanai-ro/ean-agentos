@@ -1306,6 +1306,36 @@ def handle_session_end(data: Optional[Dict] = None):
     except Exception as e:
         log_error(f"Eroare auto-backup în session_end: {e}")
 
+    # === AUTO SESSION SUMMARY ===
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Get all messages from this session
+        cursor.execute("""
+            SELECT role, content FROM messages
+            WHERE session_id = ? ORDER BY timestamp
+        """, (session_id,))
+        msgs = cursor.fetchall()
+        if msgs and len(msgs) >= 2:
+            # Build a simple summary of what was discussed
+            user_msgs = [m[1][:200] for m in msgs if m[0] == 'user' and m[1]]
+            assistant_msgs = [m[1][:200] for m in msgs if m[0] == 'assistant' and m[1]]
+            summary = f"Session {session_id}: User asked about: {'; '.join(user_msgs[:3])}"
+            if assistant_msgs:
+                summary += f". Agent responded: {assistant_msgs[-1]}"
+
+            # Save as session summary in learned_facts
+            cursor.execute("""
+                INSERT OR IGNORE INTO learned_facts
+                (content, confidence, source, source_session_id, project_path, created_at)
+                VALUES (?, 'medium', 'session_summary', ?, ?, datetime('now'))
+            """, (summary[:2000], session_id, get_project_path()))
+            conn.commit()
+            log_debug(f"Session summary saved: {len(summary)} chars")
+        conn.close()
+    except Exception as e:
+        log_error(f"Eroare session summary: {e}")
+
     clear_current_session()
     log_debug(f"Sesiune încheiată: {session_id}, {saved_responses} răspunsuri salvate din transcript")
 
