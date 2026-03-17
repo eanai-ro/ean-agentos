@@ -236,10 +236,15 @@ ean-agentos/
 | ✅ Hooks for Claude Code, Gemini CLI, Codex CLI, Kimi CLI | **Yes** |
 | ✅ 49 database tables, 57 tests | **Yes** |
 
-### Pro 🔒 — Adds multi-agent orchestration
+### Pro 🔒 — Everything in Free + multi-agent orchestration
+
+**Pro includes the full Free edition** (persistent memory, `mem suggest`, knowledge extraction, dashboard, all CLI integrations) **plus** multi-agent orchestration capabilities:
 
 | Feature | Free | Pro |
 |---------|------|-----|
+| Persistent memory, `mem suggest`, knowledge extraction | ✅ | ✅ |
+| Web dashboard, MCP server, 30+ CLI commands | ✅ | ✅ |
+| All 4 CLI integrations (Claude, Gemini, Codex, Kimi) | ✅ | ✅ |
 | Multi-agent orchestration (projects, tasks, leases) | — | ✅ |
 | AI deliberation (multi-round, voting, synthesis) | — | ✅ |
 | CLI Launcher (launch Claude/Gemini/Codex/Kimi programmatically) | — | ✅ |
@@ -249,7 +254,11 @@ ean-agentos/
 | Replay system (project + deliberation timelines) | — | ✅ |
 | Peer review workflow (formal verdicts, auto-fix) | — | ✅ |
 
-> **Note:** Pro features (orchestration, deliberation, auto-pipeline, etc.) are available as a separate package. The free edition does not include orchestration code.
+#### Pro Demo: VPS Security Hardening — 3 Agents Deliberate
+
+![EAN AgentOS Pro Demo](demo_pro.gif)
+
+> 3 AI agents propose, critique each other, and reach consensus on a 16-point VPS hardening checklist. No single agent covered all points — the mutual critique filled the gaps. [Full demo →](demos/demo_vps_hardening.md)
 
 **Contact for Pro**: [ean@eanai.ro](mailto:ean@eanai.ro)
 
