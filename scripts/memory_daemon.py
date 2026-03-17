@@ -1154,12 +1154,19 @@ def get_memory_context(project_path: str, limit_messages: int = 10, limit_errors
             for d in decisions:
                 context_parts.append(f"  • {d[0]}: {d[1][:200] if d[1] else ''}")
 
-        # 6. Learned facts
-        cursor.execute("""
-            SELECT content FROM learned_facts
-            WHERE confidence IN ('high', 'confirmed', 'medium')
-            ORDER BY created_at DESC LIMIT 10
-        """)
+        # 6. Learned facts (column is 'fact' not 'content' in some schemas)
+        try:
+            cursor.execute("""
+                SELECT fact FROM learned_facts
+                WHERE confidence IN ('high', 'confirmed', 'medium')
+                ORDER BY created_at DESC LIMIT 10
+            """)
+        except Exception:
+            cursor.execute("""
+                SELECT content FROM learned_facts
+                WHERE confidence IN ('high', 'confirmed', 'medium')
+                ORDER BY created_at DESC LIMIT 10
+            """)
         facts = cursor.fetchall()
         if facts:
             context_parts.append("\n🧠 FAPTE ÎNVĂȚATE:")
