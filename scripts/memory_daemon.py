@@ -1142,22 +1142,55 @@ def get_memory_context(project_path: str, limit_messages: int = 10, limit_errors
             for f in files:
                 context_parts.append(f"  • {f[0]}")
 
-        # 5. Ultimele decizii importante (mesaje assistant cu keywords)
+        # 5. Decisions din tabel (structurate)
         cursor.execute("""
-            SELECT content
-            FROM messages
-            WHERE role = 'assistant'
-              AND (content LIKE '%configurat%' OR content LIKE '%creat%'
-                   OR content LIKE '%instalat%' OR content LIKE '%rezolvat%')
-            ORDER BY timestamp DESC
-            LIMIT 3
+            SELECT title, description FROM decisions
+            WHERE status = 'active'
+            ORDER BY created_at DESC LIMIT 5
         """)
-
         decisions = cursor.fetchall()
         if decisions:
-            context_parts.append("\n⚙️ DECIZII RECENTE:")
+            context_parts.append("\n⚙️ DECIZII ACTIVE:")
             for d in decisions:
-                context_parts.append(f"  • {d[0].replace(chr(10), ' ')}...")
+                context_parts.append(f"  • {d[0]}: {d[1][:200] if d[1] else ''}")
+
+        # 6. Learned facts
+        cursor.execute("""
+            SELECT content FROM learned_facts
+            WHERE confidence IN ('high', 'confirmed', 'medium')
+            ORDER BY created_at DESC LIMIT 10
+        """)
+        facts = cursor.fetchall()
+        if facts:
+            context_parts.append("\n🧠 FAPTE ÎNVĂȚATE:")
+            for f in facts:
+                context_parts.append(f"  • {f[0][:300] if f[0] else ''}")
+
+        # 7. Error resolutions (soluții la erori)
+        cursor.execute("""
+            SELECT error_summary, resolution FROM error_resolutions
+            WHERE worked = 1
+            ORDER BY created_at DESC LIMIT 5
+        """)
+        resolutions = cursor.fetchall()
+        if resolutions:
+            context_parts.append("\n💡 SOLUȚII CUNOSCUTE:")
+            for r in resolutions:
+                context_parts.append(f"  • {r[0][:150]}")
+                if r[1]:
+                    context_parts.append(f"    → {r[1][:200]}")
+
+        # 8. Goals
+        cursor.execute("""
+            SELECT title FROM goals
+            WHERE status = 'active'
+            ORDER BY created_at DESC LIMIT 3
+        """)
+        goals = cursor.fetchall()
+        if goals:
+            context_parts.append("\n🎯 OBIECTIVE ACTIVE:")
+            for g in goals:
+                context_parts.append(f"  • {g[0]}")
 
         conn.close()
 
