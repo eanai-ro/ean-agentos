@@ -281,10 +281,38 @@ def run_once() -> int:
             log(f"processed {events} events from {path}")
         total_events += events
 
+    # Close stale sessions: files not modified in >60s
+    _close_stale_sessions(state, files)
+
     state["total_events"] = int(state.get("total_events", 0) or 0) + total_events
     state["call_map"] = _CALL_LOOKUP
     save_state(state)
     return total_events
+
+
+def _close_stale_sessions(state: Dict, current_files: List[Path]) -> None:
+    """Close sessions whose wire.jsonl files haven't been modified recently."""
+    STALE_THRESHOLD = 60  # seconds
+    closed_sessions = state.setdefault("closed_sessions", [])
+    offsets = state.get("offsets", {})
+    now = time.time()
+
+    for path in current_files:
+        key = str(path.resolve())
+        if int(offsets.get(key, 0) or 0) == 0:
+            continue
+        if key in closed_sessions:
+            continue
+        try:
+            mtime = path.stat().st_mtime
+        except OSError:
+            continue
+        if now - mtime > STALE_THRESHOLD:
+            log(f"closing stale session for {path.name}")
+            _call_memory_daemon("session_end", {})
+            closed_sessions.append(key)
+            if len(closed_sessions) > 500:
+                closed_sessions[:] = closed_sessions[-200:]
 
 
 def run_watch(interval: int = 5) -> None:
