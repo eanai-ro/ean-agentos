@@ -39,8 +39,13 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 
 # === CONFIGURAȚIE ===
-MEMORY_DIR = Path.home() / ".claude" / "memory"
-GLOBAL_DB = MEMORY_DIR / "global.db"
+try:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from v2_common import resolve_db_path
+    GLOBAL_DB = resolve_db_path()
+except ImportError:
+    GLOBAL_DB = Path.home() / ".claude" / "memory" / "global.db"
+MEMORY_DIR = GLOBAL_DB.parent
 SESSION_FILE = MEMORY_DIR / ".current_session"
 SCRIPTS_DIR = MEMORY_DIR / "scripts"
 

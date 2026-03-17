@@ -28,8 +28,13 @@ from typing import Optional, Dict, Any, List, Tuple
 
 
 # === CONFIGURAȚIE ===
-MEMORY_DIR = Path.home() / ".claude" / "memory"
-GLOBAL_DB = MEMORY_DIR / "global.db"
+try:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from v2_common import resolve_db_path
+    GLOBAL_DB = resolve_db_path()
+except ImportError:
+    GLOBAL_DB = Path.home() / ".claude" / "memory" / "global.db"
+MEMORY_DIR = GLOBAL_DB.parent
 RECONCILER_STATE_FILE = MEMORY_DIR / ".reconciler_state.json"
 SESSION_FILE = MEMORY_DIR / ".current_session"
 

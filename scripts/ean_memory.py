@@ -34,7 +34,12 @@ MCP_SERVER_DIR = PROJECT_ROOT / "mcp_server"
 PID_FILE = PROJECT_ROOT / ".ean-memory.pid"
 DEFAULT_PORT = 19876
 DEFAULT_HOST = "0.0.0.0"
-MEMORY_DB_DEFAULT = Path.home() / ".claude" / "memory" / "global.db"
+try:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from v2_common import resolve_db_path as _resolve_db_path
+    MEMORY_DB_DEFAULT = _resolve_db_path()
+except ImportError:
+    MEMORY_DB_DEFAULT = Path.home() / ".claude" / "memory" / "global.db"
 
 # Agent-specific paths
 CLAUDE_DIR = Path.home() / ".claude"

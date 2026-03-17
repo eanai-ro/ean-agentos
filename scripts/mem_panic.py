@@ -16,8 +16,13 @@ from datetime import datetime
 from typing import Dict, List, Tuple, Optional, Any
 import argparse
 
-MEMORY_DIR = Path.home() / ".claude" / "memory"
-DB_FILE = MEMORY_DIR / "global.db"
+try:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from v2_common import resolve_db_path
+    DB_FILE = resolve_db_path()
+except ImportError:
+    DB_FILE = Path.home() / ".claude" / "memory" / "global.db"
+MEMORY_DIR = DB_FILE.parent
 PANIC_DIR_BASE = Path("/tmp")
 PANIC_MODE_FILE = MEMORY_DIR / ".panic_mode.json"
 DOCS_DIR = MEMORY_DIR / "docs"

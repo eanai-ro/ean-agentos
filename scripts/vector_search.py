@@ -28,8 +28,13 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
 
 # Paths
-MEMORY_DIR = Path.home() / ".claude" / "memory"
-GLOBAL_DB = MEMORY_DIR / "global.db"
+try:
+    sys.path.insert(0, str(Path(__file__).parent))
+    from v2_common import resolve_db_path
+    GLOBAL_DB = resolve_db_path()
+except ImportError:
+    GLOBAL_DB = Path.home() / ".claude" / "memory" / "global.db"
+MEMORY_DIR = GLOBAL_DB.parent
 CHROMA_DIR = MEMORY_DIR / "chroma"
 
 # Model de embedding
