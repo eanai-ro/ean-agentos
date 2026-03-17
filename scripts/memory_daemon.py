@@ -1691,6 +1691,12 @@ def handle_post_tool(data: Optional[Dict] = None):
         ))
         log_debug(f"EROARE DETECTATĂ ȘI SALVATĂ: {tool_name} - {error_msg[:100]}")
 
+    # Actualizează contorul de tool calls pe sesiune
+    cursor.execute("""
+        UPDATE sessions SET total_tool_calls = total_tool_calls + 1
+        WHERE session_id = ?
+    """, (session_id,))
+
     conn.commit()
     conn.close()
 
@@ -1781,6 +1787,12 @@ def handle_user_prompt(data: Optional[Dict] = None):
         detect_agent_name(),
     ))
 
+    # Actualizează contorul de mesaje pe sesiune
+    cursor.execute("""
+        UPDATE sessions SET total_messages = total_messages + 1
+        WHERE session_id = ?
+    """, (session_id,))
+
     conn.commit()
     conn.close()
 
@@ -1859,6 +1871,12 @@ def handle_assistant_response(data: Optional[Dict] = None):
         detect_cli_name(),
         detect_agent_name(),
     ))
+
+    # Actualizează contorul de mesaje pe sesiune
+    cursor.execute("""
+        UPDATE sessions SET total_messages = total_messages + 1
+        WHERE session_id = ?
+    """, (session_id,))
 
     conn.commit()
     conn.close()
