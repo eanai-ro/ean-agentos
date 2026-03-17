@@ -19,21 +19,27 @@ Your AI agent forgets everything between sessions. EAN AgentOS gives it permanen
 
 ### Demo: "Never solve the same bug twice"
 
-```bash
-$ python3 scripts/mem suggest 'CORS error'
+```
+SESSION 1 — Monday morning
+> Fix CORS error in Flask API
+  Agent fixes it: pip install flask-cors && CORS(app)
+  ✅ Solution saved to memory.
+
+... 3 months later ...
+
+SESSION 847 — Thursday evening
+> I'm getting a CORS error again
+
+🧠 EAN AgentOS: You solved this before.
+
+$ mem suggest 'CORS error'
 
 💡 SOLUTIONS FOR: CORS error
-======================================================================
-
-  1. [51pts] ✅  errors_solutions#1
-     Problem:  CORS error: blocked by CORS policy - No 'Access-Control-Allow-Origin' header
-     Solution: Add flask-cors middleware: from flask_cors import CORS; CORS(app, r...
+  1. [51pts] ✅ CORS error: blocked by CORS policy
+     Solution: Add flask-cors middleware: CORS(app)
      Code:     pip install flask-cors && CORS(app)
-     Match: 100.0% | Confidence: 85.0% | Reuse: 0 | Agent: —
 
-$ python3 scripts/mem search 'docker'
-$ python3 scripts/mem status
-$ python3 scripts/mem stats
+# Never solve the same bug twice.
 ```
 
 **Works with Claude Code, Gemini CLI, Codex CLI, and Kimi CLI.** All agents share the same memory.
