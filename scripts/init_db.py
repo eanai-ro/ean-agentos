@@ -972,46 +972,6 @@ def ensure_cross_agent_columns(conn):
     print("✓ Cross-agent learning columns created/verified (is_global, promoted_from_agent)")
 
 
-def ensure_orchestration_tables(conn):
-    """Creates orchestration tables for Faza 18D: MCP Orchestration V1."""
-    migration_path = Path(__file__).parent.parent / "migrations" / "017_orchestration.sql"
-    if migration_path.exists():
-        sql = migration_path.read_text()
-        # Strip comment lines before splitting on ';'
-        lines = [l for l in sql.split('\n') if not l.strip().startswith('--')]
-        clean_sql = '\n'.join(lines)
-        cur = conn.cursor()
-        for statement in clean_sql.split(';'):
-            statement = statement.strip()
-            if statement:
-                try:
-                    cur.execute(statement)
-                except sqlite3.OperationalError:
-                    pass  # Table/index already exists
-        conn.commit()
-        print("✓ Orchestration tables created/verified (18D)")
-    else:
-        print(f"⚠ Migration file not found: {migration_path}")
-
-
-def ensure_skill_observations_table(conn):
-    """Creates orch_skill_observations table for Faza 20: Skill Learning."""
-    migration_path = Path(__file__).parent.parent / "migrations" / "019_skill_observations.sql"
-    if migration_path.exists():
-        conn.executescript(migration_path.read_text())
-        conn.commit()
-        print("✓ Skill observations table created/verified (20)")
-
-
-def ensure_reviews_table(conn):
-    """Creates orch_reviews table for Faza 18H: Peer Review Workflow."""
-    migration_path = Path(__file__).parent.parent / "migrations" / "018_reviews.sql"
-    if migration_path.exists():
-        conn.executescript(migration_path.read_text())
-        conn.commit()
-        print("✓ Reviews table created/verified (18H)")
-
-
 def ensure_observability_tables(conn):
     """Migration 006: Audit log, detection rules, detection events."""
     migration_path = Path(__file__).parent.parent / "migrations" / "006_observability_tables.sql"
