@@ -1807,6 +1807,34 @@ def handle_user_prompt(data: Optional[Dict] = None):
 
     log_debug(f"Prompt salvat: {len(prompt_scrubbed)} caractere")
 
+    # === PROACTIVE CONTEXT PRE-FETCH (la primul prompt din sesiune) ===
+    try:
+        conn2 = get_db_connection()
+        cur2 = conn2.cursor()
+        cur2.execute("SELECT COUNT(*) FROM messages WHERE session_id = ? AND role = 'user'", (session_id,))
+        msg_count = cur2.fetchone()[0]
+        if msg_count <= 1 and len(prompt_scrubbed) > 10:
+            # Primul prompt — caută soluții relevante via FTS5
+            keywords = ' '.join(w for w in prompt_scrubbed.split()[:15] if len(w) > 3)
+            if keywords:
+                try:
+                    cur2.execute("""
+                        SELECT error_message, solution FROM errors_solutions
+                        WHERE error_message LIKE ? AND solution IS NOT NULL AND solution_worked = 1
+                        ORDER BY resolved_at DESC LIMIT 3
+                    """, (f"%{keywords.split()[0]}%",))
+                    matches = cur2.fetchall()
+                    if matches:
+                        hints = []
+                        for m in matches:
+                            hints.append(f"  • {m[0][:100]} → {m[1][:150]}")
+                        log_debug(f"Pre-fetch: {len(matches)} relevant solutions found")
+                except Exception:
+                    pass
+        conn2.close()
+    except Exception:
+        pass
+
     # === TRANSCRIPT RECONCILER (capturează erori ratate) ===
     reconciler_result = None
     try:

@@ -79,8 +79,10 @@ except ImportError:
 
 def get_db_connection() -> sqlite3.Connection:
     """Obține conexiune la baza de date."""
-    conn = sqlite3.connect(str(GLOBAL_DB))
+    conn = sqlite3.connect(str(GLOBAL_DB), timeout=30)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=5000")
     return conn
 
 
