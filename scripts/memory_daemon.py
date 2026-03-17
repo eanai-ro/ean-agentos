@@ -89,10 +89,9 @@ def detect_cli_name() -> str:
     if "gemini" in script_caller.lower():
         return "gemini-cli"
 
-    # 4. Default — verifică ce config-uri există
-    if Path.home().joinpath(".claude").exists():
-        return "claude-code"
-
+    # 4. Fallback: prefer "unknown" over guessing wrong
+    # Hooks and watchers MUST set MEMORY_CLI_NAME explicitly.
+    # If we reach here, the caller didn't set it.
     return "unknown"
 
 

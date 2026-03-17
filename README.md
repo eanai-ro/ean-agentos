@@ -257,7 +257,7 @@ ean-agentos/
 | Replay system (project + deliberation timelines) | — | ✅ |
 | Peer review workflow (formal verdicts, auto-fix) | — | ✅ |
 
-> **Note:** Some orchestration files in this repo (e.g. `orchestrator.py`, `deliberation.py`) are compatibility stubs that return upgrade guidance. They exist so the system doesn't crash if Pro features are referenced. The executable multi-agent orchestration code is in Pro only.
+> **Note:** Pro features (orchestration, deliberation, auto-pipeline, etc.) are available as a separate package. The free edition does not include orchestration code.
 
 **Contact for Pro**: [ean@eanai.ro](mailto:ean@eanai.ro)
 

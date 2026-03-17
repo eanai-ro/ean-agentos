@@ -69,8 +69,11 @@ def _header(title):
 
 def _port_in_use(port):
     """Check if port is currently in use."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        return s.connect_ex(("127.0.0.1", port)) == 0
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex(("127.0.0.1", port)) == 0
+    except (PermissionError, OSError):
+        return False
 
 def _api_healthy(port=DEFAULT_PORT):
     """Check if API server responds to health check."""
@@ -108,16 +111,21 @@ def _which(cmd):
     return shutil.which(cmd)
 
 def _db_path():
-    """Determine the database path."""
+    """Determine the database path. Mirrors resolve_db_path() from v2_common.py:
+    1. MEMORY_DB_PATH env var (override explicit)
+    2. <project_root>/global.db (canonical V2)
+    3. ~/.claude/memory/global.db (legacy fallback)
+    """
     env_path = os.environ.get("MEMORY_DB_PATH")
     if env_path:
         return Path(env_path)
+    project_db = PROJECT_ROOT / "global.db"
+    if project_db.exists():
+        return project_db
     if MEMORY_DB_DEFAULT.exists():
         return MEMORY_DB_DEFAULT
-    local_db = PROJECT_ROOT / "global.db"
-    if local_db.exists():
-        return local_db
-    return MEMORY_DB_DEFAULT
+    # Default: project-local (init_db will create it)
+    return project_db
 
 
 # === DISCOVERY ===

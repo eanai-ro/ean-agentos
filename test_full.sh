@@ -67,7 +67,6 @@ echo -e "${CYAN}━━━ 1. STRUCTURE & FILES ━━━${NC}"
 [ -f "$ROOT/scripts/backup_manager.py" ] && pass "backup_manager.py exists" || fail "backup_manager.py" "missing"
 [ -f "$ROOT/scripts/experience_graph.py" ] && pass "experience_graph.py exists" || fail "experience_graph.py" "missing"
 [ -f "$ROOT/scripts/search_memory.py" ] && pass "search_memory.py exists" || fail "search_memory.py" "missing"
-[ -f "$ROOT/scripts/license_gate.py" ] && pass "license_gate.py exists" || fail "license_gate.py" "missing"
 [ -f "$ROOT/scripts/ean_memory.py" ] && pass "ean_memory.py (installer) exists" || fail "ean_memory.py" "missing"
 [ -f "$ROOT/scripts/web_server.py" ] && pass "web_server.py exists" || fail "web_server.py" "missing"
 [ -f "$ROOT/web/index.html" ] && pass "web/index.html exists" || fail "web dashboard" "missing"
@@ -85,12 +84,12 @@ echo -e "${CYAN}━━━ 2. DATABASE ━━━${NC}"
 python3 "$ROOT/scripts/init_db.py" > /dev/null 2>&1
 if [ -f "$ROOT/global.db" ]; then
     pass "Database initialized"
-    TABLE_COUNT=$(sqlite3 "$ROOT/global.db" "SELECT COUNT(*) FROM sqlite_master WHERE type='table';" 2>/dev/null)
+    TABLE_COUNT=$(python3 -c "import sqlite3; c=sqlite3.connect('$ROOT/global.db'); print(c.execute(\"SELECT COUNT(*) FROM sqlite_master WHERE type='table'\").fetchone()[0]); c.close()" 2>/dev/null)
     [ "$TABLE_COUNT" -ge 30 ] && pass "Database has $TABLE_COUNT tables (≥30)" || warn "Database has only $TABLE_COUNT tables"
 
     # Check critical tables
     for tbl in decisions learned_facts goals tasks error_resolutions errors_solutions sessions messages tool_calls; do
-        sqlite3 "$ROOT/global.db" "SELECT 1 FROM $tbl LIMIT 0;" 2>/dev/null && pass "Table '$tbl' exists" || fail "Table '$tbl'" "missing"
+        python3 -c "import sqlite3; c=sqlite3.connect('$ROOT/global.db'); c.execute('SELECT 1 FROM $tbl LIMIT 0'); c.close()" 2>/dev/null && pass "Table '$tbl' exists" || fail "Table '$tbl'" "missing"
     done
 else
     fail "Database" "global.db not created"
@@ -112,77 +111,12 @@ python3 -c "from search_memory import search_all; print('OK')" 2>/dev/null && pa
 python3 -c "from cognitive_search import search_resolutions; print('OK')" 2>/dev/null && pass "cognitive_search imports" || fail "cognitive_search" "import error"
 python3 -c "from error_learning import *; print('OK')" 2>/dev/null && pass "error_learning imports" || fail "error_learning" "import error"
 python3 -c "from memory_scoring import *; print('OK')" 2>/dev/null && pass "memory_scoring imports" || fail "memory_scoring" "import error"
-python3 -c "from license_gate import get_license_info, check_premium; print('OK')" 2>/dev/null && pass "license_gate imports" || fail "license_gate" "import error"
 python3 -c "from branch_manager import *; print('OK')" 2>/dev/null && pass "branch_manager imports" || fail "branch_manager" "import error"
 
 echo ""
 
 # ================================================================
-echo -e "${CYAN}━━━ 4. PREMIUM STUBS ━━━${NC}"
-# ================================================================
-
-# Verify premium files are stubs, not real implementations
-ORCH_SIZE=$(wc -c < "$ROOT/scripts/orchestrator.py" 2>/dev/null || echo 0)
-[ "$ORCH_SIZE" -lt 3000 ] && pass "orchestrator.py is stub ($ORCH_SIZE bytes)" || warn "orchestrator.py seems too large ($ORCH_SIZE bytes)"
-
-python3 -c "
-from orchestrator import create_project, CLI_PROFILES
-r = create_project('test')
-assert 'error' in r or 'Pro' in str(r), 'Stub should return error'
-assert len(CLI_PROFILES) == 4, 'Should have 4 CLI profiles'
-print('OK')
-" 2>/dev/null && pass "orchestrator stub works (returns upgrade message)" || fail "orchestrator stub" "broken"
-
-python3 -c "
-from deliberation import DeliberationEngine
-e = DeliberationEngine()
-r = e.create_session('test')
-assert 'error' in r or 'Pro' in str(r)
-print('OK')
-" 2>/dev/null && pass "deliberation stub works" || fail "deliberation stub" "broken"
-
-python3 -c "
-from orch_api import orch_bp
-print('OK')
-" 2>/dev/null && pass "orch_api stub imports" || fail "orch_api stub" "import error"
-
-echo ""
-
-# ================================================================
-echo -e "${CYAN}━━━ 5. LICENSE GATE ━━━${NC}"
-# ================================================================
-
-python3 -c "
-from license_gate import get_license_info, check_premium, get_plan
-info = get_license_info()
-plan = get_plan()
-print(f'Plan: {plan}')
-# Without license file, should be community
-# (or enterprise if user has license)
-assert plan in ('community', 'team', 'enterprise'), f'Invalid plan: {plan}'
-print('OK')
-" 2>/dev/null && pass "License gate returns valid plan" || fail "license_gate" "broken"
-
-# Check premium features gated
-python3 -c "
-from license_gate import check_premium, clear_cache, get_plan
-import os, tempfile, json
-# Test with no license
-clear_cache()
-# If user has license, that's fine too
-plan = get_plan()
-if plan == 'community':
-    assert not check_premium('orchestration'), 'Should not have orchestration in community'
-    print('Community: orchestration blocked')
-else:
-    print(f'{plan}: orchestration allowed (license present)')
-print('OK')
-" 2>/dev/null && pass "Feature gating works correctly" || fail "feature gating" "broken"
-
-echo ""
-
-# ================================================================
-echo -e "${CYAN}━━━ 6. MEM SUGGEST (Killer Feature) ━━━${NC}"
+echo -e "${CYAN}━━━ 4. MEM SUGGEST (Killer Feature) ━━━${NC}"
 # ================================================================
 
 # Test suggest with empty DB
@@ -229,7 +163,7 @@ print('OK')
 echo ""
 
 # ================================================================
-echo -e "${CYAN}━━━ 7. EXPERIENCE GRAPH ━━━${NC}"
+echo -e "${CYAN}━━━ 5. EXPERIENCE GRAPH ━━━${NC}"
 # ================================================================
 
 python3 -c "
@@ -242,7 +176,7 @@ print('OK')
 echo ""
 
 # ================================================================
-echo -e "${CYAN}━━━ 8. CONTEXT BUILDER ━━━${NC}"
+echo -e "${CYAN}━━━ 6. CONTEXT BUILDER ━━━${NC}"
 # ================================================================
 
 python3 -c "
@@ -262,7 +196,7 @@ print('OK')
 echo ""
 
 # ================================================================
-echo -e "${CYAN}━━━ 9. SEARCH MEMORY ━━━${NC}"
+echo -e "${CYAN}━━━ 7. SEARCH MEMORY ━━━${NC}"
 # ================================================================
 
 python3 -c "
@@ -275,7 +209,7 @@ print('OK')
 echo ""
 
 # ================================================================
-echo -e "${CYAN}━━━ 10. WEB SERVER ━━━${NC}"
+echo -e "${CYAN}━━━ 8. WEB SERVER ━━━${NC}"
 # ================================================================
 
 # Quick start/stop test
@@ -295,7 +229,7 @@ wait $WEB_PID 2>/dev/null
 echo ""
 
 # ================================================================
-echo -e "${CYAN}━━━ 11. MCP SERVER ━━━${NC}"
+echo -e "${CYAN}━━━ 9. MCP SERVER ━━━${NC}"
 # ================================================================
 
 python3 -c "
@@ -317,7 +251,7 @@ print('OK')
 echo ""
 
 # ================================================================
-echo -e "${CYAN}━━━ 12. CLI DETECTION ━━━${NC}"
+echo -e "${CYAN}━━━ 10. CLI DETECTION ━━━${NC}"
 # ================================================================
 
 for cli in claude gemini codex kimi; do
@@ -332,19 +266,19 @@ done
 echo ""
 
 # ================================================================
-echo -e "${CYAN}━━━ 13. DB INTEGRITY ━━━${NC}"
+echo -e "${CYAN}━━━ 11. DB INTEGRITY ━━━${NC}"
 # ================================================================
 
-INTEGRITY=$(sqlite3 "$ROOT/global.db" "PRAGMA integrity_check;" 2>/dev/null)
+INTEGRITY=$(python3 -c "import sqlite3; c=sqlite3.connect('$ROOT/global.db'); print(c.execute('PRAGMA integrity_check').fetchone()[0]); c.close()" 2>/dev/null)
 [ "$INTEGRITY" = "ok" ] && pass "PRAGMA integrity_check: OK" || fail "DB integrity" "$INTEGRITY"
 
-WAL=$(sqlite3 "$ROOT/global.db" "PRAGMA journal_mode;" 2>/dev/null)
+WAL=$(python3 -c "import sqlite3; c=sqlite3.connect('$ROOT/global.db'); print(c.execute('PRAGMA journal_mode').fetchone()[0]); c.close()" 2>/dev/null)
 [ "$WAL" = "wal" ] && pass "WAL mode enabled" || warn "Journal mode: $WAL (expected wal)"
 
 echo ""
 
 # ================================================================
-echo -e "${CYAN}━━━ 14. BACKUP SYSTEM ━━━${NC}"
+echo -e "${CYAN}━━━ 12. BACKUP SYSTEM ━━━${NC}"
 # ================================================================
 
 python3 -c "
