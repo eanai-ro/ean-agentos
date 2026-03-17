@@ -541,6 +541,7 @@ def _install_claude(args):
             "env": {
                 "MEMORY_BASE_URL": f"http://localhost:{DEFAULT_PORT}",
                 "MEMORY_PROJECT_PATH": str(Path.home()),
+                "MEMORY_CLI_NAME": "claude-code",
                 "MEMORY_AGENT_NAME": "claude-code",
                 "MEMORY_MODEL_NAME": "claude-opus-4-6",
                 "MEMORY_PROVIDER": "anthropic"
@@ -1009,6 +1010,8 @@ args = ["{mcp_server}"]
 [mcp.servers.env]
 MEMORY_DB_PATH = "{db_path}"
 MEMORY_BASE_URL = "http://localhost:19876"
+MEMORY_CLI_NAME = "kimi-cli"
+MEMORY_AGENT_NAME = "kimi-cli"
 """
 
     if config_file.exists():

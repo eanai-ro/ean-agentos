@@ -118,6 +118,8 @@ def main():
     # Setează environment
     env = os.environ.copy()
     env["MEMORY_DIR"] = env.get("MEMORY_DIR", str(PROJECT_ROOT))
+    env.setdefault("MEMORY_CLI_NAME", "gemini-cli")
+    env.setdefault("MEMORY_AGENT_NAME", "gemini-cli")
 
     # Apelează memory_daemon.py cu handler-ul tradus
     try:

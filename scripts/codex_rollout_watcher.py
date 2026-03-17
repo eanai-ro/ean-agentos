@@ -186,6 +186,8 @@ def parse_jsonl_line(line: str) -> Optional[Tuple[str, Dict]]:
 def _call_memory_daemon(handler_name: str, payload: Dict) -> bool:
     env = dict(os.environ)
     env["MEMORY_DIR"] = MEMORY_DIR
+    env["MEMORY_CLI_NAME"] = "codex-cli"
+    env["MEMORY_AGENT_NAME"] = "codex-cli"
     try:
         proc = subprocess.run(
             ["python3", str(MEMORY_DAEMON), handler_name],

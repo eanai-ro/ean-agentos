@@ -7,6 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 export MEMORY_DIR="${MEMORY_DIR:-$PROJECT_ROOT}"
+export MEMORY_CLI_NAME="${MEMORY_CLI_NAME:-claude-code}"
 mkdir -p "$MEMORY_DIR/sessions"
 
 exec python3 "$PROJECT_ROOT/scripts/memory_daemon.py" session_start

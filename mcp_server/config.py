@@ -17,4 +17,4 @@ PROJECT_PATH = os.environ.get("MEMORY_PROJECT_PATH", os.getcwd())
 DEFAULT_AGENT = os.environ.get("MEMORY_AGENT_NAME", "mcp-agent")
 DEFAULT_MODEL = os.environ.get("MEMORY_MODEL_NAME", "unknown")
 DEFAULT_PROVIDER = os.environ.get("MEMORY_PROVIDER", "mcp")
-CLI_NAME = "mcp-memory-server"
+CLI_NAME = os.environ.get("MEMORY_CLI_NAME", "mcp-memory-server")
