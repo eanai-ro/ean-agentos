@@ -9,10 +9,34 @@ import os
 import re
 import json
 import hashlib
+import logging
 import sqlite3
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, List, Dict, Any
+
+
+# === CENTRALIZED LOGGING ===
+def get_logger(name: str) -> logging.Logger:
+    """Get a logger with file + stderr output. Usage: logger = get_logger(__name__)"""
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        logger.setLevel(logging.DEBUG if os.environ.get("EAN_DEBUG") else logging.INFO)
+        fmt = logging.Formatter("%(asctime)s [%(name)s] %(levelname)s: %(message)s", datefmt="%H:%M:%S")
+        # Stderr handler (always)
+        sh = logging.StreamHandler()
+        sh.setFormatter(fmt)
+        logger.addHandler(sh)
+        # File handler (if writable)
+        try:
+            log_dir = Path(__file__).parent.parent
+            fh = logging.FileHandler(str(log_dir / "ean-agentos.log"), encoding="utf-8")
+            fh.setFormatter(fmt)
+            fh.setLevel(logging.WARNING)  # Only warnings+ to file
+            logger.addHandler(fh)
+        except (OSError, PermissionError):
+            pass
+    return logger
 
 
 # === PATHS ===

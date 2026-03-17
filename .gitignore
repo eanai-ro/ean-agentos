@@ -36,3 +36,4 @@ Thumbs.db
 
 # Test artifacts
 tests/test_*.db
+ean-agentos.log
