@@ -12,12 +12,16 @@ from pathlib import Path
 from datetime import datetime, timedelta
 import argparse
 
-MEMORY_DIR = Path.home() / ".claude" / "memory"
-DB_FILE = MEMORY_DIR / "global.db"
+try:
+    from v2_common import resolve_db_path
+    DB_FILE = resolve_db_path()
+except ImportError:
+    DB_FILE = Path.home() / ".claude" / "memory" / "global.db"
+MEMORY_DIR = DB_FILE.parent
 
 def get_db():
     """Conectare DB."""
-    return sqlite3.connect(DB_FILE)
+    return sqlite3.connect(str(DB_FILE))
 
 def format_size(bytes_size):
     """Format size human-readable."""
