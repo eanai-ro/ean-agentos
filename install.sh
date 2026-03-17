@@ -222,9 +222,32 @@ fi
 echo ""
 
 # ================================================================
+# START MEMORY SERVER (background)
+# ================================================================
+echo -e "${CYAN}━━━ Step 6: Start Memory Server ━━━${NC}"
+
+cd "$PROJECT_ROOT"
+# Start server in background if not already running
+if command -v python3 &>/dev/null; then
+    # Check if server is already running
+    if curl -s http://localhost:19876/ > /dev/null 2>&1; then
+        echo -e "  ${GREEN}✓${NC} Memory server already running on port 19876"
+    else
+        nohup python3 scripts/web_server.py --host 127.0.0.1 --port 19876 > /dev/null 2>&1 &
+        sleep 2
+        if curl -s http://localhost:19876/ > /dev/null 2>&1; then
+            echo -e "  ${GREEN}✓${NC} Memory server started (port 19876)"
+        else
+            echo -e "  ${YELLOW}⚠${NC} Memory server: start manually with: python3 scripts/web_server.py"
+        fi
+    fi
+fi
+echo ""
+
+# ================================================================
 # QUICK VALIDATION
 # ================================================================
-echo -e "${CYAN}━━━ Step 6: Quick Validation ━━━${NC}"
+echo -e "${CYAN}━━━ Step 7: Quick Validation ━━━${NC}"
 
 cd "$PROJECT_ROOT/scripts"
 
@@ -255,6 +278,9 @@ echo -e "${GREEN}║       Installation Complete! 🎉                      ║$
 echo -e "${GREEN}║                                                      ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════════╝${NC}"
 echo ""
+echo -e "  ${CYAN}${BOLD}IMPORTANT: Restart your AI CLI now!${NC}"
+echo -e "  Close and reopen Claude Code (or other CLI) to activate hooks."
+echo ""
 echo -e "  ${CYAN}Quick start:${NC}"
 echo ""
 echo -e "    ${BOLD}mem suggest \"CORS error\"${NC}     Find past solutions"
@@ -263,8 +289,7 @@ echo -e "    ${BOLD}mem status${NC}                   Check status"
 echo -e "    ${BOLD}mem decisions${NC}                View decisions"
 echo ""
 echo -e "  ${CYAN}Web dashboard:${NC}"
-echo -e "    python3 scripts/web_server.py"
-echo -e "    Open: ${BOLD}http://localhost:19876${NC}"
+echo -e "    ${BOLD}http://localhost:19876${NC} (started automatically)"
 echo ""
 echo -e "  ${CYAN}Add CLI later:${NC}"
 echo -e "    python3 scripts/ean_memory.py install claude"

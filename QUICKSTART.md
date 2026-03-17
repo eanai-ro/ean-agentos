@@ -32,6 +32,9 @@ The installer will:
 - Create the database
 - Set up the `mem` command
 - Detect and configure your AI CLIs (Claude Code, Gemini, Codex, Kimi)
+- **Start the memory server** (port 19876)
+
+> **After install: restart your AI CLI!** Close and reopen Claude Code (or other CLI) to activate the hooks.
 
 ## Step 2: Try it
 
