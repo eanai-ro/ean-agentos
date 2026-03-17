@@ -228,13 +228,22 @@ echo -e "${CYAN}━━━ Step 6: Start Memory Server + Autostart ━━━${NC}
 
 cd "$PROJECT_ROOT"
 
-# Create autostart script
+# Create autostart script (server + Codex watcher)
 cat > "$PROJECT_ROOT/start_server.sh" << SRVEOF
 #!/bin/bash
-# EAN AgentOS — Memory Server Autostart
+# EAN AgentOS — Memory Server + Services Autostart
 cd "$PROJECT_ROOT"
+
+# Start web/API server if not running
 if ! curl -s http://localhost:19876/ > /dev/null 2>&1; then
     nohup python3 scripts/web_server.py --host 127.0.0.1 --port 19876 > /dev/null 2>&1 &
+fi
+
+# Start Codex rollout watcher if Codex is installed and watcher exists
+if [ -f scripts/codex_rollout_watcher.py ] && command -v codex &>/dev/null; then
+    if ! pgrep -f "codex_rollout_watcher" > /dev/null 2>&1; then
+        nohup python3 scripts/codex_rollout_watcher.py --watch --interval 10 > /dev/null 2>&1 &
+    fi
 fi
 SRVEOF
 chmod +x "$PROJECT_ROOT/start_server.sh"
