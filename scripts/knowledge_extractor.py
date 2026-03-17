@@ -50,32 +50,51 @@ class ExtractionPatterns:
     # --- Decisions ---
     # Pattern weights: contribuie direct la scor (max 0.60 cap)
     DECISION_PATTERNS = [
-        # EN — explicit decisions (V2: optional adverb between subject and verb)
-        (r"(?:we|i)\s+(?:\w+\s+)?decided?\s+(?:to\s+)?(.{10,120})", 0.55),
-        (r"(?:let'?s|we'?ll)\s+(?:use|go with|stick with|switch to|move to)\s+(.{5,100})", 0.50),
-        (r"final\s+decision[:\s]+(.{10,120})", 0.60),
-        (r"(?:we|i)\s+(?:\w+\s+)?(?:chose|picked|selected)\s+(.{5,100})", 0.50),
-        (r"going\s+(?:with|for)\s+(.{5,80})", 0.40),
+        # EN — explicit decisions
+        (r"(?:we|i)\s+(?:\w+\s+)?decided?\s+(?:to\s+)?(.{10,200})", 0.55),
+        (r"(?:let'?s|we'?ll)\s+(?:use|go with|stick with|switch to|move to)\s+(.{5,200})", 0.50),
+        (r"final\s+decision[:\s]+(.{10,200})", 0.60),
+        (r"(?:we|i)\s+(?:\w+\s+)?(?:chose|picked|selected)\s+(.{5,200})", 0.50),
+        (r"going\s+(?:with|for)\s+(.{5,200})", 0.40),
+        # EN — relaxed (natural language)
+        (r"(?:we|i)\s+(?:should|will|need to|must|want to)\s+(.{10,200})", 0.35),
+        (r"(?:the\s+)?(?:best|right|correct)\s+(?:approach|way|solution|choice)\s+(?:is|would be)\s+(.{10,200})", 0.40),
+        (r"(?:recommend|suggest|propose)\s+(?:using|to use|that we)\s+(.{10,200})", 0.40),
+        (r"(?:implemented|created|built|added|configured|installed)\s+(.{10,200})", 0.35),
         # RO — explicit
-        (r"am\s+decis\s+(?:să\s+)?(.{10,120})", 0.55),
-        (r"(?:mergem|rămânem|trecem)\s+(?:pe|la|cu)\s+(.{5,100})", 0.50),
-        (r"(?:folosim|păstrăm|alegem|implementăm)\s+(.{5,100})", 0.45),
-        (r"decizia?\s+(?:finală|e|este)[:\s]+(.{10,120})", 0.60),
+        (r"am\s+decis\s+(?:să\s+)?(.{10,200})", 0.55),
+        (r"(?:mergem|rămânem|trecem)\s+(?:pe|la|cu)\s+(.{5,200})", 0.50),
+        (r"(?:folosim|păstrăm|alegem|implementăm)\s+(.{5,200})", 0.45),
+        (r"decizia?\s+(?:finală|e|este)[:\s]+(.{10,200})", 0.60),
+        # RO — relaxed
+        (r"(?:am\s+)?(?:implementat|creat|construit|adăugat|configurat|instalat)\s+(.{10,200})", 0.35),
+        (r"(?:trebuie|vom|ar trebui)\s+(?:să\s+)?(.{10,200})", 0.30),
+        (r"(?:cel mai bun|cea mai bună|corect|optim)\s+(?:e|este|ar fi)\s+(.{10,200})", 0.40),
     ]
 
     # --- Facts ---
     FACT_PATTERNS = [
         # EN
-        (r"(?:it\s+)?(?:supports?|requires?|uses?|runs?\s+on|depends?\s+on)\s+(.{5,100})", 0.40),
-        (r"(?:the\s+)?default\s+(?:is|port|value|path)[:\s]+(.{3,80})", 0.45),
-        (r"(?:is\s+stored|lives?)\s+(?:in|at)\s+(.{5,80})", 0.40),
-        (r"(?:important|note|remember)[:\s]+(.{10,120})", 0.50),
-        (r"(?:does\s+not|doesn'?t)\s+support\s+(.{5,80})", 0.45),
+        (r"(?:it\s+)?(?:supports?|requires?|uses?|runs?\s+on|depends?\s+on)\s+(.{5,200})", 0.40),
+        (r"(?:the\s+)?default\s+(?:is|port|value|path)[:\s]+(.{3,200})", 0.45),
+        (r"(?:is\s+stored|lives?)\s+(?:in|at)\s+(.{5,200})", 0.40),
+        (r"(?:important|note|remember)[:\s]+(.{10,200})", 0.50),
+        (r"(?:does\s+not|doesn'?t)\s+support\s+(.{5,200})", 0.45),
+        # EN — relaxed
+        (r"(?:works?\s+with|compatible\s+with|integrates?\s+with)\s+(.{5,200})", 0.35),
+        (r"(?:there\s+are|we\s+have|contains?|includes?)\s+(\d+\s+.{5,200})", 0.35),
+        (r"(?:the\s+)?(?:database|DB|server|API|system)\s+(?:is|has|contains|runs)\s+(.{5,200})", 0.35),
+        (r"(?:version|versiune)\s+(?:is|e|este)\s+(.{3,100})", 0.40),
         # RO
-        (r"(?:suportă|necesită|folosește|rulează\s+pe)\s+(.{5,100})", 0.40),
-        (r"(?:portul|calea|valoarea)\s+(?:este|e|default)[:\s]+(.{3,80})", 0.45),
-        (r"(?:important|atenție|notă|reține)[:\s]+(.{10,120})", 0.50),
-        (r"(?:nu\s+suportă|nu\s+funcționează\s+cu)\s+(.{5,80})", 0.45),
+        (r"(?:suportă|necesită|folosește|rulează\s+pe)\s+(.{5,200})", 0.40),
+        (r"(?:portul|calea|valoarea)\s+(?:este|e|default)[:\s]+(.{3,200})", 0.45),
+        (r"(?:important|atenție|notă|reține)[:\s]+(.{10,200})", 0.50),
+        (r"(?:nu\s+suportă|nu\s+funcționează\s+cu)\s+(.{5,200})", 0.45),
+        # RO — relaxed
+        (r"(?:funcționează\s+cu|e\s+compatibil\s+cu)\s+(.{5,200})", 0.35),
+        (r"(?:avem|există|conține|include)\s+(\d+\s+.{5,200})", 0.35),
+        (r"(?:baza\s+de\s+date|serverul|API-ul|sistemul)\s+(?:e|este|are|conține)\s+(.{5,200})", 0.35),
+        (r"(?:memoria|proiectul|versiunea)\s+(?:e|este|are)\s+(.{5,200})", 0.35),
     ]
 
     # --- Resolutions ---
@@ -485,11 +504,11 @@ class KnowledgeExtractor:
         text = text.strip()
         # Prea scurt (sub 3 cuvinte reale)
         words = [w for w in text.split() if len(w) > 1]
-        if len(words) < 3:
+        if len(words) < 2:
             return False
         # Pure code (doar simboluri + keywords)
         alpha_ratio = sum(1 for c in text if c.isalpha()) / max(len(text), 1)
-        if alpha_ratio < 0.4:
+        if alpha_ratio < 0.3:
             return False
         # Doar un path/url
         if re.match(r"^[/~][\w/.-]+$", text) or re.match(r"^https?://", text):
@@ -511,7 +530,7 @@ class KnowledgeExtractor:
             if in_code_block:
                 continue
 
-            if len(line) < 15:
+            if len(line) < 8:
                 continue
             # Skip linii care sunt doar cod sau formatting
             if line.startswith("    ") or line.startswith("| "):
