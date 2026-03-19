@@ -9,6 +9,8 @@
 >
 > Works across Claude Code, Gemini CLI, Codex, and Kimi CLI.
 > One shared memory. All agents. All sessions.
+>
+> 🚀 **140+ developers already tried AgentOS in the first days after launch**
 
 ![EAN AgentOS Demo](demo_free.gif)
 
