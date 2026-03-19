@@ -5,17 +5,27 @@
 [![Tests: 48 passing](https://img.shields.io/badge/Tests-48%20passing-brightgreen.svg)](test_full.sh)
 [![CLIs: Claude · Gemini · Codex · Kimi](https://img.shields.io/badge/CLIs-Claude%20·%20Gemini%20·%20Codex%20·%20Kimi-purple.svg)](#supported-clis)
 
-### Persistent Memory for AI Coding Agents
-
-**Never solve the same bug twice.**
+> 🧠 AI agents forget. AgentOS remembers.
+>
+> Works across Claude Code, Gemini CLI, Codex, and Kimi CLI.
+> One shared memory. All agents. All sessions.
 
 ![EAN AgentOS Demo](demo_free.gif)
 
 ---
 
-## What does EAN AgentOS do?
+## 🤔 Why this exists
 
-Your AI agent forgets everything between sessions. EAN AgentOS gives it permanent memory.
+AI coding tools are powerful — but stateless.
+
+You fix a bug today. Tomorrow, it's gone.
+
+Worse:
+- Long sessions get compacted — context disappears
+- Switching tools means starting over
+- Each CLI has its own isolated memory
+
+AgentOS solves this by making experience persistent. Not prompts. Not docs. **Actual outcomes**: what worked, what failed, what decisions were made.
 
 ### Demo: "Never solve the same bug twice"
 
@@ -46,7 +56,18 @@ $ mem suggest 'CORS error'
 
 ---
 
-## Features
+## 👤 Who is this for?
+
+- Developers using AI coding tools daily
+- People working across multiple CLI agents
+- Anyone tired of repeating the same fixes
+- Builders working on long-running projects
+
+If you've ever said: *"Didn't I already fix this before?"* — this is for you.
+
+---
+
+## 🧠 Core Capabilities
 
 | Feature | Description |
 |---------|-------------|
@@ -221,7 +242,7 @@ ean-agentos/
 
 ---
 
-## Free vs Pro — What You Get
+## ⚡ Free vs Pro — Scaling beyond memory
 
 ### Free (this repo) — Full persistent memory system
 
@@ -287,6 +308,16 @@ Real output from multi-agent orchestration sessions — [see all demos](demos/RE
 
 ---
 
+## 💬 Community & Discussions
+
+Got questions, ideas, or feedback?
+
+👉 [GitHub Discussions](https://github.com/eanai-ro/ean-agentos/discussions)
+
+Share your use case, report bugs, or suggest improvements.
+
+---
+
 ## ⭐ Feedback & Support
 
 If you try this, I'd love to hear what worked — and especially what didn't.
@@ -308,4 +339,4 @@ MIT — see [LICENSE](LICENSE)
 
 Built by **EAN** (Encean Alexandru Nicolae) 🇷🇴
 
-*Persistent memory for AI agents. Don't forget. Don't repeat. Learn.*
+**Stop restarting. Start building on what you already solved.**
