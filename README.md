@@ -287,6 +287,17 @@ Real output from multi-agent orchestration sessions — [see all demos](demos/RE
 
 ---
 
+## ⭐ Feedback & Support
+
+If you try this, I'd love to hear what worked — and especially what didn't.
+
+This project is still evolving based on real workflows, so your feedback matters a lot.
+
+If you find it useful, consider giving it a star ⭐
+It helps more people discover it.
+
+---
+
 ## License
 
 MIT — see [LICENSE](LICENSE)
